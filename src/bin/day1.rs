@@ -54,7 +54,6 @@ pub mod p2 {
     }
 }
 
-
 #[cfg(test)]
 mod day1_tests {
     use super::*;
