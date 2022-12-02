@@ -1,11 +1,10 @@
-#![feature(io_read_to_string)]
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::read_to_string;
 
 fn main() {
-    let mut f = File::open("day10.1.txt").unwrap();
+    let mut f = File::open("input/day10/input.txt").unwrap();
     let s = read_to_string(&mut f).unwrap();
     let score = syntax_error_score(&s, &ERR_POINT_TABLE);
     assert_eq!(score, 367059);
@@ -125,10 +124,10 @@ fn syntax_error_score(s: &str, point_table: &HashMap<char, u64>) -> u64 {
 mod tests {
     use super::*;
 
+    const SAMPLE: &str = include_str!("../../input/day10/sample.txt");
     #[test]
     fn part_two_works() {
-        let s = include_str!("day10.test.txt");
-        let score = completion_score(s, &COMPLETION_POINT_TABLE);
+        let score = completion_score(SAMPLE, &COMPLETION_POINT_TABLE);
         assert_eq!(score, 288957)
     }
 
@@ -145,8 +144,7 @@ mod tests {
 
     #[test]
     fn part_one_works() {
-        let s = include_str!("day10.test.txt");
-        let score = syntax_error_score(s, &ERR_POINT_TABLE);
+        let score = syntax_error_score(SAMPLE, &ERR_POINT_TABLE);
         assert_eq!(score, 26397)
     }
 

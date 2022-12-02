@@ -1,9 +1,8 @@
-#![feature(io_read_to_string)]
 use std::fs::File;
 use std::io::read_to_string;
 
 fn main() {
-    let mut f = File::open("day9.1.txt").unwrap();
+    let mut f = File::open("input/day09/input.txt").unwrap();
     let s = read_to_string(&mut f).unwrap();
     let hm: HeightMap = s.parse().unwrap();
 
@@ -133,11 +132,10 @@ impl std::str::FromStr for HeightMap {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    const SAMPLE: &str = include_str!("../../input/day09/sample.txt");
     #[test]
     fn part_two_works() {
-        let s = include_str!("day9.test.txt");
-        let hm: HeightMap = s.parse().unwrap();
+        let hm: HeightMap = SAMPLE.parse().unwrap();
         let score = hm.basin_score();
         assert_eq!(score, 1134);
     }
@@ -156,8 +154,7 @@ mod tests {
 
     #[test]
     fn part_one_works() {
-        let s = include_str!("day9.test.txt");
-        let hm: HeightMap = s.parse().unwrap();
+        let hm: HeightMap = SAMPLE.parse().unwrap();
         let risk = hm.risk_factor();
         assert_eq!(risk, 15);
     }

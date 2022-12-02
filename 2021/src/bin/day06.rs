@@ -1,10 +1,9 @@
-#![feature(io_read_to_string)]
 use std::fs::File;
 use std::io::read_to_string;
 use std::str::FromStr;
 
 fn main() {
-    let mut f = File::open("day6.1.txt").unwrap();
+    let mut f = File::open("input/day06/input.txt").unwrap();
     let s = read_to_string(&mut f).unwrap();
     let input = &s[..s.len() - 1];
 

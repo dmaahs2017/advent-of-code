@@ -1,11 +1,10 @@
-#![feature(io_read_to_string)]
 use std::fs::File;
 use std::io::read_to_string;
 use std::num::ParseIntError;
 use std::str::FromStr;
 
 fn main() {
-    let mut f = File::open("day2.1.txt").unwrap();
+    let mut f = File::open("input/day02/input.txt").unwrap();
     let data = read_to_string(&mut f).unwrap();
     // Not sure why but there is an empty string at the end after the split operation
     let input = data.split('\n').collect::<Vec<_>>();

@@ -1,11 +1,10 @@
-#![feature(io_read_to_string)]
 
 use std::fs::File;
 use std::io::read_to_string;
 use std::str::FromStr;
 
 fn main() {
-    let mut f = File::open("day4.1.txt").unwrap();
+    let mut f = File::open("input/day04/input.txt").unwrap();
     let s = read_to_string(&mut f).unwrap();
 
     let bs: BingoSolver = s.parse().unwrap();
@@ -131,26 +130,22 @@ impl FromStr for Board {
 mod tests {
     use super::*;
 
+    const SAMPLE: &str = include_str!("../../input/day04/sample.txt");
     #[test]
     fn part_one_test() {
-        let input = include_str!("day4.test.txt");
-        let bs: BingoSolver = input.parse().unwrap();
-
+        let bs: BingoSolver = SAMPLE.parse().unwrap();
         assert_eq!(bs.first_winner(), 4512);
     }
 
     #[test]
     fn part_two_test() {
-        let input = include_str!("day4.test.txt");
-        let bs: BingoSolver = input.parse().unwrap();
-
+        let bs: BingoSolver = SAMPLE.parse().unwrap();
         assert_eq!(bs.last_winner(), 1924);
     }
 
     #[test]
     fn load_board_works() {
-        let input = include_str!("day4.test.txt");
-        let bs: BingoSolver = input.parse().unwrap();
+        let bs: BingoSolver = SAMPLE.parse().unwrap();
 
         assert_eq!(bs.numbers[0], 7);
         assert_eq!(*bs.numbers.last().unwrap(), 1);

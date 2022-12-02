@@ -1,10 +1,9 @@
-#![feature(io_read_to_string)]
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::read_to_string;
 
 fn main() {
-    let mut f = File::open("day3.1.txt").unwrap();
+    let mut f = File::open("input/day03/input.txt").unwrap();
     let s = read_to_string(&mut f).unwrap();
     let s = s.split_whitespace().collect::<Vec<_>>();
 

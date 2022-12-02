@@ -1,9 +1,8 @@
-#![feature(io_read_to_string)]
 use std::fs::File;
 use std::io::read_to_string;
 
 fn main() {
-    let mut f = File::open("day11.1.txt").unwrap();
+    let mut f = File::open("input/day11/input.txt").unwrap();
     let s = read_to_string(&mut f).unwrap();
     let mut m: EnergyMap = s.parse().unwrap();
     let flashes = m.flashes_after(100);
@@ -159,17 +158,16 @@ impl std::str::FromStr for EnergyMap {
 #[cfg(test)]
 mod test {
     use super::*;
+    const SAMPLE: &str = include_str!("../../input/day11/sample.txt");
     #[test]
     fn first_simul_flash_works() {
-        let s = include_str!("day11.test.txt");
-        let mut m: EnergyMap = s.parse().unwrap();
+        let mut m: EnergyMap = SAMPLE.parse().unwrap();
         let ans = m.steps_to_simul();
         assert_eq!(ans, 195);
     }
     #[test]
     fn part_one_works() {
-        let s = include_str!("day11.test.txt");
-        let mut m: EnergyMap = s.parse().unwrap();
+        let mut m: EnergyMap = SAMPLE.parse().unwrap();
         let flashes = m.flashes_after(100);
         assert_eq!(flashes, 1656);
     }

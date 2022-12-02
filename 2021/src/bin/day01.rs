@@ -1,10 +1,8 @@
-#![feature(io_read_to_string)]
-
 use std::fs::File;
 use std::io::read_to_string;
 
 fn main() {
-    let mut f = File::open("day1.1.txt").unwrap();
+    let mut f = File::open("input/day01/input.txt").unwrap();
     let is = read_to_string(&mut f).unwrap();
     let input: Vec<i32> = is
         .split_whitespace()
