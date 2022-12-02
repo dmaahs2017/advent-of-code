@@ -1,6 +1,5 @@
 #![feature(test)]
 extern crate test;
-use test::Bencher;
 
 fn main() {
     let input = include_str!("../../inputs/day1/input.txt");
@@ -40,33 +39,40 @@ fn solve_puzzle_2(input: &str) -> usize {
         .sum()
 }
 
-#[allow(dead_code)]
+#[cfg(test)]
 fn solve_puzzle_2_with_sorting(input: &str) -> usize {
     let mut v = parse_input(input).collect::<Vec<_>>();
     v.sort();
     v.iter().rev().take(3).sum()
 }
 
-#[bench]
-fn bench_puzzle_2(b: &mut Bencher) {
-    let input = include_str!("../../inputs/day1/sample.txt");
-    b.iter(|| solve_puzzle_2(input))
+#[cfg(test)]
+mod day1_tests {
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench_puzzle_2(b: &mut Bencher) {
+        let input = include_str!("../../inputs/day1/sample.txt");
+        b.iter(|| solve_puzzle_2(input))
+    }
+
+    #[bench]
+    fn bench_puzzle_2_with_sorting(b: &mut Bencher) {
+        let input = include_str!("../../inputs/day1/sample.txt");
+        b.iter(|| solve_puzzle_2_with_sorting(input))
+    }
+
+    #[test]
+    fn solve_puzzle_2_works() {
+        let input = include_str!("../../inputs/day1/sample.txt");
+        assert_eq!(solve_puzzle_2(input), 45000)
+    }
+
+    #[test]
+    fn solve_puzzle_1_works() {
+        let input = include_str!("../../inputs/day1/sample.txt");
+        assert_eq!(solve_puzzle_1(input), 24000)
+    }
 }
 
-#[bench]
-fn bench_puzzle_2_with_sorting(b: &mut Bencher) {
-    let input = include_str!("../../inputs/day1/sample.txt");
-    b.iter(|| solve_puzzle_2_with_sorting(input))
-}
-
-#[test]
-fn solve_puzzle_2_works() {
-    let input = include_str!("../../inputs/day1/sample.txt");
-    assert_eq!(solve_puzzle_2(input), 45000)
-}
-
-#[test]
-fn solve_puzzle_1_works() {
-    let input = include_str!("../../inputs/day1/sample.txt");
-    assert_eq!(solve_puzzle_1(input), 24000)
-}
