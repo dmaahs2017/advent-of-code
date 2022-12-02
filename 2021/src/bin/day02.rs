@@ -12,8 +12,6 @@ fn main() {
     assert_eq!(x * y, 1840243);
     println!("Final Position: ({}, {}) = {}", x, y, x * y);
 
-    let mut f = File::open("day2.2.txt").unwrap();
-    let data = read_to_string(&mut f).unwrap();
     let input = data.split('\n').collect::<Vec<_>>();
 
     // Not sure why but there is an empty string at the end after the split operation
