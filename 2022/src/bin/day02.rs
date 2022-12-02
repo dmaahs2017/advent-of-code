@@ -1,10 +1,15 @@
 #![feature(test)]
 extern crate test;
+use aoc_2022::*;
+
+const DAY: u8 = 2;
 
 fn main() {
-    let input = include_str!("../../inputs/day2/input.txt");
-    println!("Part 1 answer = {}", p1::solve(input));
-    println!("Part 2 answer = {}", p2::solve(input));
+    let input = &read_input(DAY);
+    println!(
+        "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
+        DAY, p1::solve(input), p2::solve(input)
+    );
 }
 
 /// Parse input into an iterator over meaningful data
@@ -70,31 +75,31 @@ pub mod p2 {
 }
 
 #[cfg(test)]
-mod day2_tests {
+mod day02_tests {
     use super::*;
     use test::Bencher;
 
     #[bench]
     fn bench_p1(b: &mut Bencher) {
-        let input = include_str!("../../inputs/day2/input.txt");
+        let input = include_str!("../../inputs/day02/input.txt");
         b.iter(|| p1::solve(input))
     }
 
     #[bench]
     fn bench_p2(b: &mut Bencher) {
-        let input = include_str!("../../inputs/day2/input.txt");
+        let input = include_str!("../../inputs/day02/input.txt");
         b.iter(|| p2::solve(input))
     }
 
     #[test]
     fn p2_works() {
-        let input = include_str!("../../inputs/day2/sample.txt");
+        let input = include_str!("../../inputs/day02/sample.txt");
         assert_eq!(p2::solve(input), 12)
     }
 
     #[test]
     fn p1_works() {
-        let input = include_str!("../../inputs/day2/sample.txt");
+        let input = include_str!("../../inputs/day02/sample.txt");
         assert_eq!(p1::solve(input), 15)
     }
 }

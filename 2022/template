@@ -1,0 +1,57 @@
+#![allow(unused)]
+#![feature(test)]
+extern crate test;
+use aoc_2022::*;
+
+const DAY: u8 = NN;
+
+fn main() {
+    let input = &read_input(DAY);
+    println!(
+        "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
+        DAY, p1::solve(input), p2::solve(input)
+    );
+}
+
+pub mod p1 {
+    use super::*;
+    pub fn solve(input: &str) -> usize {
+        todo!("Solve part 1")
+    }
+}
+
+pub mod p2 {
+    use super::*;
+    pub fn solve(input: &str) -> usize {
+        todo!("Solve part 2")
+    }
+}
+
+#[cfg(test)]
+mod dayNN_tests {
+    use super::*;
+    use test::Bencher;
+    
+    const SAMPLE: &str = include_str!("../../inputs/dayNN/sample.txt");
+
+    #[test]
+    fn p1_works() {
+        assert_eq!(p1::solve(SAMPLE), 15)
+    }
+
+    #[test]
+    fn p2_works() {
+        assert_eq!(p2::solve(SAMPLE), 12)
+    }
+
+
+    #[bench]
+    fn bench_p1(b: &mut Bencher) {
+        b.iter(|| p1::solve(SAMPLE))
+    }
+
+    #[bench]
+    fn bench_p2(b: &mut Bencher) {
+        b.iter(|| p2::solve(SAMPLE))
+    }
+}

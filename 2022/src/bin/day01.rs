@@ -1,15 +1,14 @@
 #![feature(test)]
 extern crate test;
+use aoc_2022::*;
+
+const DAY: u8 = 1;
 
 fn main() {
-    let input = include_str!("../../inputs/day1/input.txt");
+    let input = &read_input(DAY);
     println!(
-        "The elf with the most calories carries {} calories",
-        p1::solve(input)
-    );
-    println!(
-        "The sum of 3 elves with the most calories is {}",
-        p2::solve(input)
+        "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
+        DAY, p1::solve(input), p2::solve(input)
     );
 }
 
@@ -55,37 +54,37 @@ pub mod p2 {
 }
 
 #[cfg(test)]
-mod day1_tests {
+mod day01_tests {
     use super::*;
     use test::Bencher;
 
     #[bench]
     fn bench_p2(b: &mut Bencher) {
-        let input = include_str!("../../inputs/day1/input.txt");
+        let input = include_str!("../../inputs/day01/input.txt");
         b.iter(|| p1::solve(input))
     }
 
     #[bench]
     fn bench_p2_with_sorting(b: &mut Bencher) {
-        let input = include_str!("../../inputs/day1/input.txt");
+        let input = include_str!("../../inputs/day01/input.txt");
         b.iter(|| p2::solve_with_sorting(input))
     }
 
     #[test]
     fn p2_works() {
-        let input = include_str!("../../inputs/day1/sample.txt");
+        let input = include_str!("../../inputs/day01/sample.txt");
         assert_eq!(p2::solve(input), 45000)
     }
 
     #[test]
     fn p2_with_sorting_works() {
-        let input = include_str!("../../inputs/day1/sample.txt");
+        let input = include_str!("../../inputs/day01/sample.txt");
         assert_eq!(p2::solve_with_sorting(input), 45000)
     }
 
     #[test]
     fn p1_works() {
-        let input = include_str!("../../inputs/day1/sample.txt");
+        let input = include_str!("../../inputs/day01/sample.txt");
         assert_eq!(p1::solve(input), 24000)
     }
 }
