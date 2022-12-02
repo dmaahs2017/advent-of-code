@@ -1,6 +1,6 @@
 #![feature(test)]
 extern crate test;
-use aoc_2022::*;
+use aoc_2015::*;
 
 const DAY: u8 = NN;
 
