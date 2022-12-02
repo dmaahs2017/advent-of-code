@@ -45,12 +45,12 @@ mod dayNN_tests {
     #[bench]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p1::solve(SAMPLE))
+        b.iter(|| p1::solve(input))
     }
 
     #[bench]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p2::solve(SAMPLE))
+        b.iter(|| p2::solve(input))
     }
 }

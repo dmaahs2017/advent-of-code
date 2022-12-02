@@ -8,19 +8,22 @@ fn main() {
     let input = &read_input(DAY);
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
-        DAY, p1::solve(input), p2::solve(input)
+        DAY,
+        p1::solve(input),
+        p2::solve(input)
     );
 }
 
 pub mod p1 {
     pub fn solve(input: &str) -> isize {
-        input.chars().map(|c| {
-            match c {
+        input
+            .chars()
+            .map(|c| match c {
                 '(' => 1,
                 ')' => -1,
                 _ => 0,
-            }
-        }).sum()
+            })
+            .sum()
     }
 }
 
@@ -32,15 +35,15 @@ pub mod p2 {
             match c {
                 '(' => {
                     sum += 1;
-                },
+                }
                 ')' => {
                     sum -= 1;
-                },
-                _ => {},
+                }
+                _ => {}
             }
             cur += 1;
             if sum < 0 {
-                break
+                break;
             }
         }
         cur
@@ -51,7 +54,7 @@ pub mod p2 {
 mod day01_tests {
     use super::*;
     use test::Bencher;
-    
+
     const SAMPLE: &str = include_str!("../../inputs/day01/sample.txt");
 
     #[test]
@@ -65,7 +68,6 @@ mod day01_tests {
     fn p2_works() {
         assert_eq!(p2::solve(SAMPLE), 1)
     }
-
 
     #[bench]
     fn bench_p1(b: &mut Bencher) {
