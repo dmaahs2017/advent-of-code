@@ -53,6 +53,29 @@ pub mod p2 {
                 let final_set = group
                     .iter()
                     .map(|rucksack| rucksack.chars().collect::<HashSet<char>>())
+                    .reduce(|mut a, b| {
+                        intersect(&mut a, &b);
+                        a
+                    })
+                    .expect("I should not have an empty iterator");
+
+                let badge = final_set
+                    .into_iter()
+                    .next()
+                    .expect("I should have just 1 value in this set");
+                score(badge)
+            })
+            .sum()
+    }
+
+    pub fn solve_with_default_intersection(input: &str) -> usize {
+        let lines = input.lines().collect::<Vec<_>>();
+        lines
+            .chunks(3)
+            .map(|group| {
+                let final_set = group
+                    .iter()
+                    .map(|rucksack| rucksack.chars().collect::<HashSet<char>>())
                     .reduce(|a, b| a.intersection(&b).cloned().collect::<HashSet<_>>())
                     .expect("I should not have an empty iterator");
 
@@ -90,8 +113,14 @@ mod day03_tests {
     }
 
     #[bench]
-    fn bench_p2(b: &mut Bencher) {
+    fn bench_p2_in_place_intersection(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| p2::solve(input))
+    }
+
+    #[bench]
+    fn bench_p2_std_intersection(b: &mut Bencher) {
+        let input = &read_input(DAY);
+        b.iter(|| p2::solve_with_default_intersection(input))
     }
 }
