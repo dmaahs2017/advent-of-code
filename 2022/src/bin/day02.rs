@@ -14,7 +14,7 @@ fn main() {
 
 /// Parse input into an iterator over meaningful data
 fn parse_input(input: &str) -> impl Iterator<Item = (char, char)> + '_ {
-    input.split('\n').filter(|s| s.len() >= 3).map(|round| {
+    input.lines().filter(|s| s.len() >= 3).map(|round| {
         let round = round.as_bytes();
         let them = round[0] as char;
         let me = round[2] as char;
