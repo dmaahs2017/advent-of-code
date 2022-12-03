@@ -16,13 +16,12 @@ fn main() {
 }
 
 fn score(c: char) -> usize {
-    let value = if c.is_uppercase() {
-        c as u8 - b'A' + 27
-    } else {
-        c as u8 - b'a' + 1
+    let v = match c {
+        'A'..='Z' => c as u8 - b'A' + 27,
+        'a'..='z' => c as u8 - b'a' + 1,
+        _ => 0,
     };
-
-    value as usize
+    v as usize
 }
 
 pub mod p1 {
