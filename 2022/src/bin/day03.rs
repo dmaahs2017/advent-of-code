@@ -51,7 +51,9 @@ pub mod p2 {
 
     pub fn solve_single_hashset(input: &str) -> usize {
         let mut set = HashSet::new();
-        input.lines().array_chunks::<3>()
+        input
+            .lines()
+            .array_chunks::<3>()
             .map(|groups| {
                 set.clear();
                 groups[0].chars().collect_into(&mut set);
@@ -67,7 +69,6 @@ pub mod p2 {
                 score(*badge)
             })
             .sum()
-
     }
 
     pub fn solve_with_in_place_intersection(input: &str) -> usize {
@@ -117,18 +118,29 @@ pub mod p2 {
 #[cfg(test)]
 mod day03_tests {
     use super::*;
-    use test::Bencher;
 
     const SAMPLE: &str = include_str!("../../inputs/day03/sample.txt");
 
     #[test]
-    fn p1_works() {
+    fn p1_sample() {
         assert_eq!(p1::solve(SAMPLE), 157)
     }
 
     #[test]
-    fn p2_works() {
+    fn p1_input() {
+        let input = &read_input(DAY);
+        assert_eq!(p1::solve(input), 7878)
+    }
+
+    #[test]
+    fn p2_sample() {
         assert_eq!(p2::solve(SAMPLE), 70)
+    }
+
+    #[test]
+    fn p2_input() {
+        let input = &read_input(DAY);
+        assert_eq!(p2::solve(input), 2760)
     }
 
     #[test]
@@ -145,6 +157,12 @@ mod day03_tests {
     fn p2_works_with_in_place_intersection() {
         assert_eq!(p2::solve_with_in_place_intersection(SAMPLE), 70)
     }
+}
+
+#[cfg(test)]
+mod day03_benchmarks {
+    use super::*;
+    use test::Bencher;
 
     #[bench]
     fn bench_p1(b: &mut Bencher) {
