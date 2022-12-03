@@ -14,7 +14,7 @@ fn main() {
 
 /// Parse input into an iterator over meaningful data
 fn parse_input(input: &str) -> impl Iterator<Item = (char, char)> + '_ {
-    input.split('\n').filter(|s| s.len() >= 3).map(|round| {
+    input.lines().filter(|s| s.len() >= 3).map(|round| {
         let round = round.as_bytes();
         let them = round[0] as char;
         let me = round[2] as char;
@@ -56,18 +56,12 @@ pub mod p2 {
         parse_input(input)
             .map(|(them, should_win)| {
                 let them = them as i8 - 'A' as i8 + 1;
-                let mut me = match should_win {
-                    'X' => them - 1,
-                    'Y' => them,
-                    'Z' => them + 1,
+                let me = match should_win {
+                    'X' => ( them - 1 + 3 ) % 3,  // I should lose
+                    'Y' => them,                  // Tie
+                    'Z' => ( them + 1 ) % 3,      // I should win
                     _ => unreachable!("Should win field can only be Win, Lose, or Draw"),
                 };
-                if me == 0 {
-                    me = 3
-                }
-                if me == 4 {
-                    me = 1
-                }
                 score(them, me)
             })
             .sum()
