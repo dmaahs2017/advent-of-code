@@ -59,7 +59,6 @@ pub mod p2 {
         parse_input(input)
             .map(|(them, should_win)| {
                 let them = them as usize - 'A' as usize;
-                dbg!(them);
                 match should_win {
                     'X' => me_score[(them + 2) % 3],
                     'Y' => me_score[them] + 3,
