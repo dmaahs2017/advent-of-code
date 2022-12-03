@@ -8,7 +8,9 @@ fn main() {
     let input = &read_input(DAY);
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
-        DAY, p1::solve(input), p2::solve(input)
+        DAY,
+        p1::solve(input),
+        p2::solve(input)
     );
 }
 
