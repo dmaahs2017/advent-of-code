@@ -27,20 +27,41 @@ pub mod p2 {
 #[cfg(test)]
 mod dayNN_tests {
     use super::*;
-    use test::Bencher;
     
     const SAMPLE: &str = include_str!("../../inputs/dayNN/sample.txt");
 
     #[test]
-    fn p1_works() {
-        assert_eq!(p1::solve(SAMPLE), 15)
+    fn p1_sample() {
+        assert_eq!(p1::solve(SAMPLE), 0)
     }
 
-    //#[test]
-    //fn p2_works() {
-    //    assert_eq!(p2::solve(SAMPLE), 12)
-    //}
+    #[test]
+    #[ignore]
+    fn p1_input() {
+        let input = &read_input(DAY);
+        assert_eq!(p1::solve(input), 0)
+    }
 
+    #[test]
+    #[ignore]
+    fn p2_sample() {
+        assert_eq!(p2::solve(SAMPLE), 0)
+    }
+
+    #[test]
+    #[ignore]
+    fn p2_input() {
+        let input = &read_input(DAY);
+        assert_eq!(p2::solve(input), 0)
+    }
+
+
+}
+
+#[cfg(test)]
+mod dayNN_benchmarks {
+    use super::*;
+    use test::Bencher;
 
     #[bench]
     fn bench_p1(b: &mut Bencher) {
