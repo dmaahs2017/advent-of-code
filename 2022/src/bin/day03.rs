@@ -1,4 +1,4 @@
-#![feature(test)]
+#![feature(test, iter_array_chunks, iter_collect_into)]
 extern crate test;
 use aoc_2022::*;
 use std::collections::HashSet;
@@ -44,7 +44,33 @@ pub mod p1 {
 
 pub mod p2 {
     use super::*;
+
     pub fn solve(input: &str) -> usize {
+        solve_single_hashset(input)
+    }
+
+    pub fn solve_single_hashset(input: &str) -> usize {
+        let mut set = HashSet::new();
+        input.lines().array_chunks::<3>()
+            .map(|groups| {
+                set.clear();
+                groups[0].chars().collect_into(&mut set);
+                for group in &groups[1..] {
+                    set.retain(|s| group.contains(*s))
+                }
+
+                let badge = set
+                    .iter()
+                    .next()
+                    .expect("I should have just 1 value in this set");
+
+                score(*badge)
+            })
+            .sum()
+
+    }
+
+    pub fn solve_with_in_place_intersection(input: &str) -> usize {
         let lines = input.lines().collect::<Vec<_>>();
         lines
             .chunks(3)
@@ -67,7 +93,7 @@ pub mod p2 {
             .sum()
     }
 
-    pub fn solve_with_default_intersection(input: &str) -> usize {
+    pub fn solve_with_std_intersection(input: &str) -> usize {
         let lines = input.lines().collect::<Vec<_>>();
         lines
             .chunks(3)
@@ -105,6 +131,21 @@ mod day03_tests {
         assert_eq!(p2::solve(SAMPLE), 70)
     }
 
+    #[test]
+    fn p2_works_with_single_hashset() {
+        assert_eq!(p2::solve_single_hashset(SAMPLE), 70)
+    }
+
+    #[test]
+    fn p2_works_with_std_intersection() {
+        assert_eq!(p2::solve_with_std_intersection(SAMPLE), 70)
+    }
+
+    #[test]
+    fn p2_works_with_in_place_intersection() {
+        assert_eq!(p2::solve_with_in_place_intersection(SAMPLE), 70)
+    }
+
     #[bench]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
@@ -112,14 +153,20 @@ mod day03_tests {
     }
 
     #[bench]
+    fn bench_p2_single_hashset(b: &mut Bencher) {
+        let input = &read_input(DAY);
+        b.iter(|| p2::solve_single_hashset(input))
+    }
+
+    #[bench]
     fn bench_p2_in_place_intersection(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p2::solve(input))
+        b.iter(|| p2::solve_with_in_place_intersection(input))
     }
 
     #[bench]
     fn bench_p2_std_intersection(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p2::solve_with_default_intersection(input))
+        b.iter(|| p2::solve_with_std_intersection(input))
     }
 }
