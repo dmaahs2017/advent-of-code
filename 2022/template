@@ -2,7 +2,7 @@
 extern crate test;
 use aoc_2022::*;
 
-const DAY: u8 = NN;
+const DAY: u8 = {N};
 
 fn main() {
     let input = &read_input(DAY);
@@ -25,10 +25,10 @@ pub mod p2 {
 }
 
 #[cfg(test)]
-mod dayNN_tests {
+mod day{NN}_tests {
     use super::*;
     
-    const SAMPLE: &str = include_str!("../../inputs/dayNN/sample.txt");
+    const SAMPLE: &str = include_str!("../../inputs/day{NN}/sample.txt");
 
     #[test]
     fn p1_sample() {
@@ -59,7 +59,7 @@ mod dayNN_tests {
 }
 
 #[cfg(test)]
-mod dayNN_benchmarks {
+mod day{NN}_benchmarks {
     use super::*;
     use test::Bencher;
 
