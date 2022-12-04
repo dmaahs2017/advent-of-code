@@ -1,7 +1,7 @@
 name: Update 2021 stars
 on:
   schedule:
-    - cron: "* * */1 * *"  # Every day
+    - cron: "5 * */1 * *"  # Every day
   workflow_dispatch:
 
 jobs:
