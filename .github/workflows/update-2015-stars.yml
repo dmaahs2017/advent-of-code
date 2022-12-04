@@ -1,0 +1,21 @@
+name: Update 2015 stars
+on:
+  schedule:
+    - cron: "* * */1 * *"  # Every day
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: k2bd/advent-readme-stars@v1
+        with:
+          headerPrefix: ###
+          tableMarker: <!--- advent_readme_stars table 2015 --->
+          userId: 1733281
+          leaderboardId: 1733281
+          sessionCookie: ${{ secrets.AOC_SESSION }}
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update README stars 2015

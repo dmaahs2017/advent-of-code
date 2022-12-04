@@ -1,6 +1,8 @@
 # Advent of Code!
 ## Stars!
-<!--- advent_readme_stars table --->
+<!--- advent_readme_stars table 2022 --->
+<!--- advent_readme_stars table 2021 --->
+<!--- advent_readme_stars table 2015 --->
 ## Understanding the layout
 ```
 .

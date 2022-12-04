@@ -1,7 +1,7 @@
-name: Update README ⭐
+name: Update 2021 stars
 on:
   schedule:
-    - cron: "*/15 * * * *"  # Every 15 minutes
+    - cron: "* * */1 * *"  # Every day
   workflow_dispatch:
 
 jobs:
@@ -11,9 +11,11 @@ jobs:
       - uses: actions/checkout@v2
       - uses: k2bd/advent-readme-stars@v1
         with:
+          headerPrefix: ###
+          tableMarker: <!--- advent_readme_stars table 2021 --->
           userId: 1733281
           leaderboardId: 1733281
           sessionCookie: ${{ secrets.AOC_SESSION }}
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update README stars
+          commit_message: Update README stars 2021
