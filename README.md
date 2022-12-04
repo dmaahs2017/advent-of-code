@@ -15,6 +15,8 @@
 │   │   │   ├── dayNN.rs
 │   │   └── lib.rs            ──────────── Common code that may be used between all the challenges
 │   └── template              ──────────── This is the template file used by `new_day.sh`
+│   └── session.txt           ──────────── This is the session token used by `new_day.sh` you have to create this and store you AOC session token here
+│   └── day_generator.sh      ──────────── Helper script used by `new_day.sh`. Don't call this directly
 └── README.md
 ```
 

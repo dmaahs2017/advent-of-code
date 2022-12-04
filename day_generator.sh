@@ -12,7 +12,7 @@ today=$(TZ=America/New_York date +%d)
 current_year=$(TZ=America/New_York date +%Y)
 if [[ $day -le $today || $year -le $current_year ]]
 then
-    curl -b "session=$(cat session.txt)" "https://adventofcode.com/$year/day/$day_no_leading_zero/input" > inputs/day$day/input.txt
+    curl -b "session=$(cat ../session.txt)" "https://adventofcode.com/$year/day/$day_no_leading_zero/input" > inputs/day$day/input.txt
 else
     echo "Cannot get input! It's not time yet!"
 fi
