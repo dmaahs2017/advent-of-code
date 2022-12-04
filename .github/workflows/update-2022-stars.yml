@@ -1,7 +1,7 @@
 name: Update 2022 stars
 on:
   schedule:
-    - cron: "*/15 * * * *"  # Every 15 minutes
+    - cron: "0 */4 * * *"  # Every 4 hours
   workflow_dispatch:
 
 jobs:
