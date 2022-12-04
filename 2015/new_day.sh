@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
+day=$1
+year=2015
 
-cat template | sed "s/NN/$1/g" > src/bin/day$1.rs;
-mkdir inputs/day$1;
-touch inputs/day$1/{input.txt,sample.txt};
+../day_generator.sh $day $year
