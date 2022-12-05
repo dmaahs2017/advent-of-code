@@ -1,3 +1,4 @@
+#![allow(incomplete_features)]
 #![feature(return_position_impl_trait_in_trait)]
 use std::fs;
 use std::io::read_to_string;
