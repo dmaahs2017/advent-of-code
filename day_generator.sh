@@ -4,7 +4,7 @@ year=$2
 
 day_no_leading_zero=$(echo $day | sed 's/^0*//')
 
-cat template | sed -e "s/{NN}/$1/g" -e "s/{N}/$day_no_leading_zero/" > src/bin/day$1.rs;
+cat ../template | sed -e "s/{NN}/$1/g" -e "s/{N}/$day_no_leading_zero/" > src/bin/day$1.rs;
 mkdir inputs/day$day;
 touch inputs/day$day/{input.txt,sample.txt};
 
