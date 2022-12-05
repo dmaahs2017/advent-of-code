@@ -80,6 +80,7 @@ pub mod p2 {
     }
 
     #[test]
+    #[cfg(test)]
     fn has_non_overlapping_pair_works() {
         let one = "xyaaabc"; // false
         let two = "xabcyyab"; // true: ab
