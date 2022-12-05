@@ -8,7 +8,9 @@ fn main() {
     let input = &read_input(DAY);
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
-        DAY, p1::solve(input), p2::solve(input)
+        DAY,
+        p1::solve(input),
+        p2::solve(input)
     );
 }
 
@@ -53,18 +55,18 @@ pub mod p2 {
     use super::*;
     /// Following the Elf's instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?
     pub fn solve(input: &str) -> usize {
+        let me_score = [1, 2, 3];
         parse_input(input)
             .map(|(them, should_win)| {
-                let them = them as i8 - 'A' as i8 + 1;
-                let me = match should_win {
-                    'X' => ( them - 1 + 3 ) % 3,  // I should lose
-                    'Y' => them,                  // Tie
-                    'Z' => ( them + 1 ) % 3,      // I should win
+                let them = them as usize - 'A' as usize;
+                match should_win {
+                    'X' => me_score[(them + 2) % 3],
+                    'Y' => me_score[them] + 3,
+                    'Z' => me_score[(them + 1) % 3] + 6,
                     _ => unreachable!("Should win field can only be Win, Lose, or Draw"),
-                };
-                score(them, me)
+                }
             })
-            .sum()
+            .sum::<usize>()
     }
 }
 
@@ -88,7 +90,9 @@ mod day02_tests {
     #[test]
     fn p2_works() {
         let input = include_str!("../../inputs/day02/sample.txt");
-        assert_eq!(p2::solve(input), 12)
+        assert_eq!(p2::solve(input), 12);
+        assert_eq!(p2::solve("A X"), 3);
+        assert_eq!(p2::solve("B Z"), 9);
     }
 
     #[test]

@@ -2,7 +2,7 @@
 extern crate test;
 use aoc_2022::*;
 
-const DAY: u8 = NN;
+const DAY: u8 = {N};
 
 fn main() {
     let input = &read_input(DAY);
@@ -20,27 +20,48 @@ pub mod p1 {
 
 pub mod p2 {
     pub fn solve(input: &str) -> usize {
-        todo!("Solve part 2 given: {}", input)
+        input.len()
     }
 }
 
 #[cfg(test)]
-mod dayNN_tests {
+mod day{NN}_tests {
+    use super::*;
+    
+    const SAMPLE: &str = include_str!("../../inputs/day{NN}/sample.txt");
+
+    #[test]
+    fn p1_sample() {
+        assert_eq!(p1::solve(SAMPLE), 0)
+    }
+
+    #[test]
+    #[ignore]
+    fn p1_input() {
+        let input = &read_input(DAY);
+        assert_eq!(p1::solve(input), 0)
+    }
+
+    #[test]
+    #[ignore]
+    fn p2_sample() {
+        assert_eq!(p2::solve(SAMPLE), 0)
+    }
+
+    #[test]
+    #[ignore]
+    fn p2_input() {
+        let input = &read_input(DAY);
+        assert_eq!(p2::solve(input), 0)
+    }
+
+
+}
+
+#[cfg(test)]
+mod day{NN}_benchmarks {
     use super::*;
     use test::Bencher;
-    
-    const SAMPLE: &str = include_str!("../../inputs/dayNN/sample.txt");
-
-    #[test]
-    fn p1_works() {
-        assert_eq!(p1::solve(SAMPLE), 15)
-    }
-
-    #[test]
-    fn p2_works() {
-        assert_eq!(p2::solve(SAMPLE), 12)
-    }
-
 
     #[bench]
     fn bench_p1(b: &mut Bencher) {
