@@ -49,9 +49,7 @@ pub mod p2 {
     pub fn solve(input: &str) -> usize {
         input
             .lines()
-            .filter(|line| {
-                has_staggered_repitition(line) && has_non_overlapping_pair(line)
-            })
+            .filter(|line| has_staggered_repitition(line) && has_non_overlapping_pair(line))
             .count()
     }
 
@@ -73,21 +71,19 @@ pub mod p2 {
             > 0
     }
 
-
     fn has_staggered_repitition(line: &str) -> bool {
-        line
-            .as_bytes()
+        line.as_bytes()
             .array_windows::<3>()
             .filter(|window| window[0] == window[2])
             .count()
-           > 0
+            > 0
     }
 
     #[test]
     fn has_non_overlapping_pair_works() {
         let one = "xyaaabc"; // false
         let two = "xabcyyab"; // true: ab
-        let three =  "uurcxstgmygtbstg"; // true 'st'
+        let three = "uurcxstgmygtbstg"; // true 'st'
         assert!(!has_non_overlapping_pair(one));
         assert!(has_non_overlapping_pair(two));
         assert!(has_non_overlapping_pair(three));
