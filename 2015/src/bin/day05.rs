@@ -1,4 +1,4 @@
-#![feature(test)]
+#![feature(test, array_windows)]
 extern crate test;
 use aoc_2015::*;
 
@@ -35,21 +35,13 @@ pub mod p2 {
         input.lines().filter(|line| {
             let staggered_repetition = line.as_bytes().windows(3).filter(|window| window[0] == window[1]).count() > 0;
 
-            let mut map: HashMap<String, (usize, usize)> = HashMap::new();
-            //let line = line.chars().collect::<Vec<_>>();
-            for (start_index, pair) in line.as_bytes().windows(2).enumerate() {
-                let pair = String::from_utf8(pair.to_vec()).unwrap();
-                if let Some((end_index, cnt)) = map.get_mut(&pair) {
-                    if start_index + 1 != *end_index {
-                        *cnt += 1;
-                    }
-                } else {
-                    map.insert(pair, ( start_index + 1, 1 ));
-                }
-
-            }
-            dbg!(&map.get("qj"));
-            let has_two_pair = map.into_values().any(|e| e.1 >= 2);
+            let has_two_pair = line
+                .as_bytes()
+                .array_windows::<2>()
+                .enumerate()
+                .fold(HashMap::new(), |mut map, (idx, pair)| {
+                    *map.entry(pair).or_default().push(idx);
+                }) 
 
             
             staggered_repetition && has_two_pair
