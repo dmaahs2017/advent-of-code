@@ -2,7 +2,7 @@
 extern crate test;
 use aoc_2015::*;
 
-const DAY: u8 = 01;
+const DAY: u8 = 1;
 
 fn main() {
     let input = &read_input(DAY);

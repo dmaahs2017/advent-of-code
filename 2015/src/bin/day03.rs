@@ -3,7 +3,7 @@ extern crate test;
 use aoc_2015::*;
 use std::collections::HashSet;
 
-const DAY: u8 = 03;
+const DAY: u8 = 3;
 
 fn main() {
     let input = &read_input(DAY);
