@@ -83,7 +83,27 @@ pub mod p1 {
 
 pub mod p2 {
     pub fn solve(input: &str) -> usize {
-        input.len()
+        input
+            .lines()
+            .map(|l| {
+                let mut new_str = String::from("\"\"");
+                for c in l.chars() {
+                    match c {
+                        '"' => {
+                            new_str.push('\\');
+                            new_str.push('"');
+                        }
+                        '\\' => {
+                            new_str.push('\\');
+                            new_str.push('\\');
+                        }
+                        c => new_str.push(c),
+                    }
+                }
+
+                new_str.len() - l.len()
+            })
+            .sum()
     }
 }
 
@@ -105,16 +125,14 @@ mod day08_tests {
     }
 
     #[test]
-    #[ignore]
     fn p2_sample() {
-        assert_eq!(p2::solve(SAMPLE), 0)
+        assert_eq!(p2::solve(SAMPLE), 19)
     }
 
     #[test]
-    #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 0)
+        assert_eq!(p2::solve(input), 2085)
     }
 }
 
