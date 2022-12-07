@@ -1,6 +1,6 @@
 #![feature(test, absolute_path)]
 extern crate test;
-use std::{path::PathBuf, collections::HashMap};
+use std::{collections::HashMap, path::PathBuf};
 
 use aoc_2022::*;
 
@@ -50,13 +50,9 @@ pub mod p1 {
     use super::*;
     pub fn solve(input: &str) -> usize {
         let map = parse(input);
-        map.values().filter_map(|&bytes| {
-            if bytes <= 100_000 {
-                Some(bytes)
-            } else {
-                None
-            }
-        }).sum()
+        map.values()
+            .filter_map(|&bytes| if bytes <= 100_000 { Some(bytes) } else { None })
+            .sum()
     }
 }
 
@@ -66,12 +62,17 @@ pub mod p2 {
         const TOTAL_SPACE: usize = 70_000_000;
         const NEEDED_SPACE: usize = 30_000_000;
         let map = parse(input);
-        let used_space = map.get(&PathBuf::from(r"/")).expect("Root dir should exist");
+        let used_space = map
+            .get(&PathBuf::from(r"/"))
+            .expect("Root dir should exist");
 
         let available = TOTAL_SPACE - used_space;
 
-        map.values().cloned().filter(|bytes| *bytes + available >= NEEDED_SPACE).min().expect("An answer should exist")
-
+        map.values()
+            .cloned()
+            .filter(|bytes| *bytes + available >= NEEDED_SPACE)
+            .min()
+            .expect("An answer should exist")
     }
 }
 
