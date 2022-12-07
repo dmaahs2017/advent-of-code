@@ -1,4 +1,4 @@
-#![feature(test, array_windows)]
+#![feature(test)]
 extern crate test;
 use aoc_2022::*;
 use std::collections::HashSet;
@@ -22,16 +22,9 @@ pub mod p1 {
             .trim()
             .as_bytes()
             .windows(4)
-            .enumerate()
-            .find_map(|(i, win)| {
-                let set = win.iter().collect::<HashSet<_>>();
-                if set.len() == 4 {
-                    Some(i + 4)
-                } else {
-                    None
-                }
-            })
+            .position(|win| win.iter().collect::<HashSet<_>>().len() == 4)
             .unwrap()
+            + 4
     }
 }
 
@@ -42,16 +35,9 @@ pub mod p2 {
             .trim()
             .as_bytes()
             .windows(14)
-            .enumerate()
-            .find_map(|(i, win)| {
-                let set = win.iter().collect::<HashSet<_>>();
-                if set.len() == 14 {
-                    Some(i + 14)
-                } else {
-                    None
-                }
-            })
+            .position(|win| win.iter().collect::<HashSet<_>>().len() == 14)
             .unwrap()
+            + 14
     }
 }
 
