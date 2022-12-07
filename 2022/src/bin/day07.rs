@@ -59,18 +59,17 @@ pub mod p1 {
 pub mod p2 {
     use super::*;
     pub fn solve(input: &str) -> usize {
-        const TOTAL_SPACE: usize = 70_000_000;
         const NEEDED_SPACE: usize = 30_000_000;
         let map = parse(input);
         let used_space = map
             .get(&PathBuf::from(r"/"))
             .expect("Root dir should exist");
 
-        let available = TOTAL_SPACE - used_space;
+        let must_free = used_space - NEEDED_SPACE;
 
         map.values()
             .cloned()
-            .filter(|bytes| *bytes + available >= NEEDED_SPACE)
+            .filter(|bytes| *bytes >= must_free)
             .min()
             .expect("An answer should exist")
     }
