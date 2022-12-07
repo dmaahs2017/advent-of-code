@@ -1,5 +1,8 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+source ../day_generator_fns.sh
+
 day=$1
 year=2022
+template_file="../template"
 
-../day_generator.sh $day $year
+generate_scaffolding $day $year $template_file
