@@ -110,16 +110,14 @@ mod day07_tests {
     }
 
     #[test]
-    #[ignore]
     fn p2_sample() {
         assert_eq!(p2::solve(SAMPLE), 24933642)
     }
 
     #[test]
-    #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 0)
+        assert_eq!(p2::solve(input), 17187447)
     }
 }
 
