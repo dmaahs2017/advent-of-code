@@ -2,7 +2,7 @@
 extern crate test;
 use std::{collections::HashMap, path::PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use aoc_2022::*;
 
 const DAY: u8 = 7;
@@ -30,9 +30,7 @@ fn parse(input: &str) -> Result<HashMap<PathBuf, usize>> {
                     })?;
 
                     if new_dir.trim().is_empty() {
-                        return None.with_context(|| {
-                            format!("cd command target should not be blank. Line: \"{}\"", line)
-                        })?;
+                        bail!("cd command target should not be blank. Line: \"{}\"", line)
                     }
 
                     if new_dir == ".." {
