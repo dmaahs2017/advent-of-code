@@ -1,5 +1,6 @@
 #![feature(test)]
 extern crate test;
+use anyhow::{Context, Error, Result};
 use aoc_2022::*;
 
 const DAY: u8 = 5;
@@ -23,20 +24,20 @@ struct Input {
 }
 
 impl std::str::FromStr for Input {
-    type Err = std::num::ParseIntError;
+    type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let begin_instructions_idx = s
             .find("move")
-            .expect("Input should have at least one instruction");
+            .with_context(|| "Failed to find the begining of the instructions")?;
 
         let instructions_slice = &s[begin_instructions_idx..];
         let instructions = instructions_slice
             .lines()
-            .map(|line| {
+            .map(|line| -> Result<_> {
                 let v = line.split_whitespace().collect::<Vec<_>>();
                 Ok((
-                    v[1].parse()?,
+                    v[1].parse::<u32>()?,
                     v[3].parse::<usize>()? - 1,
                     v[5].parse::<usize>()? - 1,
                 ))
