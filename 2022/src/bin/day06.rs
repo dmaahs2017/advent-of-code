@@ -1,4 +1,4 @@
-#![feature(test)]
+#![feature(test, iter_collect_into)]
 extern crate test;
 use aoc_2022::*;
 use std::collections::HashSet;
@@ -15,29 +15,49 @@ fn main() {
     );
 }
 
+fn start_of_unique_window(input: &str, window_size: usize) -> usize {
+    input
+        .trim()
+        .as_bytes()
+        .windows(window_size)
+        .position(|win| win.iter().collect::<HashSet<_>>().len() == window_size)
+        .unwrap()
+        + window_size
+}
+
+fn start_of_unique_window_optimized(input: &str, window_size: usize) -> usize {
+    let mut set: HashSet<u8> = HashSet::new();
+    input
+        .trim()
+        .as_bytes()
+        .windows(window_size)
+        .position(|win| {
+            set.clear();
+            win.iter().collect_into(&mut set).len() == window_size
+        })
+        .unwrap()
+        + window_size
+}
+
 pub mod p1 {
     use super::*;
     pub fn solve(input: &str) -> usize {
-        input
-            .trim()
-            .as_bytes()
-            .windows(4)
-            .position(|win| win.iter().collect::<HashSet<_>>().len() == 4)
-            .unwrap()
-            + 4
+        start_of_unique_window(input, 4)
+    }
+
+    pub fn solve_optimized(input: &str) -> usize {
+        start_of_unique_window_optimized(input, 4)
     }
 }
 
 pub mod p2 {
     use super::*;
     pub fn solve(input: &str) -> usize {
-        input
-            .trim()
-            .as_bytes()
-            .windows(14)
-            .position(|win| win.iter().collect::<HashSet<_>>().len() == 14)
-            .unwrap()
-            + 14
+        start_of_unique_window(input, 14)
+    }
+
+    pub fn solve_optimized(input: &str) -> usize {
+        start_of_unique_window_optimized(input, 14)
     }
 }
 
@@ -76,7 +96,6 @@ mod day06_benchmarks {
     use test::Bencher;
 
     #[bench]
-    #[ignore]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| p1::solve(input))
@@ -86,5 +105,17 @@ mod day06_benchmarks {
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| p2::solve(input))
+    }
+
+    #[bench]
+    fn bench_optimized_p1(b: &mut Bencher) {
+        let input = &read_input(DAY);
+        b.iter(|| p1::solve_optimized(input))
+    }
+
+    #[bench]
+    fn bench_optimized_p2(b: &mut Bencher) {
+        let input = &read_input(DAY);
+        b.iter(|| p2::solve_optimized(input))
     }
 }
