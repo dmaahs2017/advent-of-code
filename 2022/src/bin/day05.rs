@@ -1,6 +1,6 @@
 #![feature(test)]
 extern crate test;
-use anyhow::{Context, Error, Result};
+use anyhow::{Context, Result};
 use aoc_2022::*;
 
 const DAY: u8 = 5;
@@ -17,73 +17,58 @@ fn main() {
 
 type Stack = Vec<char>;
 type Instruction = (u32, usize, usize);
-#[derive(Debug)]
-struct Input {
-    stacks: Vec<Stack>,
-    instructions: Vec<Instruction>,
-}
 
-impl std::str::FromStr for Input {
-    type Err = Error;
+fn parse(s: &str) -> Result<(Vec<Stack>, Vec<Instruction>)> {
+    let begin_instructions_idx = s
+        .find("move")
+        .with_context(|| "Failed to find the begining of the instructions")?;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let begin_instructions_idx = s
-            .find("move")
-            .with_context(|| "Failed to find the begining of the instructions")?;
+    let instructions_slice = &s[begin_instructions_idx..];
+    let instructions = instructions_slice
+        .lines()
+        .map(|line| -> Result<_> {
+            let v = line.split_whitespace().collect::<Vec<_>>();
+            Ok((
+                v[1].parse::<u32>()?,
+                v[3].parse::<usize>()? - 1,
+                v[5].parse::<usize>()? - 1,
+            ))
+        })
+        .collect::<Result<_, _>>()?;
 
-        let instructions_slice = &s[begin_instructions_idx..];
-        let instructions = instructions_slice
-            .lines()
-            .map(|line| -> Result<_> {
-                let v = line.split_whitespace().collect::<Vec<_>>();
-                Ok((
-                    v[1].parse::<u32>()?,
-                    v[3].parse::<usize>()? - 1,
-                    v[5].parse::<usize>()? - 1,
-                ))
-            })
-            .collect::<Result<_, _>>()?;
+    let stacks_slice = &s[..begin_instructions_idx - 1];
+    let stack_lines = stacks_slice.lines().collect::<Vec<_>>();
 
-        let stacks_slice = &s[..begin_instructions_idx - 1];
-        let stack_lines = stacks_slice.lines().collect::<Vec<_>>();
+    let n_stacks = stacks_slice[stacks_slice.len() - 3..stacks_slice.len() - 2].parse()?;
+    let mut stacks = vec![vec![]; n_stacks];
 
-        let n_stacks = stacks_slice[stacks_slice.len() - 3..stacks_slice.len() - 2].parse()?;
-        let mut stacks = vec![vec![]; n_stacks];
-
-        for &row in stack_lines[..stack_lines.len() - 1].iter().rev() {
-            for (stack_idx, slice_idx) in (1..row.len()).step_by(4).enumerate() {
-                let c = row.as_bytes()[slice_idx] as char;
-                if c.is_alphabetic() {
-                    stacks[stack_idx].push(c)
-                }
+    for &row in stack_lines[..stack_lines.len() - 1].iter().rev() {
+        for (stack_idx, slice_idx) in (1..row.len()).step_by(4).enumerate() {
+            let c = row.as_bytes()[slice_idx] as char;
+            if c.is_alphabetic() {
+                stacks[stack_idx].push(c)
             }
         }
-
-        Ok(Input {
-            stacks,
-            instructions,
-        })
     }
+
+    Ok((stacks, instructions))
 }
 
 pub mod p1 {
     use super::*;
     pub fn solve(input: &str) -> String {
-        let mut input: Input = input.parse().unwrap();
-        for instruction in input.instructions {
+        let (mut stacks, instructions) = parse(input).expect("Malformed input");
+
+        for instruction in instructions {
             for _ in 0..instruction.0 {
-                let m = input.stacks[instruction.1]
+                let m = stacks[instruction.1]
                     .pop()
-                    .expect("Should have something to move");
-                input.stacks[instruction.2].push(m);
+                    .expect("There should be a box in the input stack to move");
+                stacks[instruction.2].push(m);
             }
         }
 
-        input
-            .stacks
-            .into_iter()
-            .filter_map(|mut s| s.pop())
-            .collect()
+        stacks.into_iter().filter_map(|mut c| c.pop()).collect()
     }
 }
 
@@ -91,19 +76,19 @@ pub mod p2 {
     use super::*;
 
     pub fn solve(input: &str) -> String {
-        let mut input: Input = input.parse().unwrap();
-        for instruction in input.instructions {
+        let (mut stacks, instructions) = parse(input).expect("Malformed input");
+        for instruction in instructions {
             let mut ms = (0..instruction.0)
-                .filter_map(|_| input.stacks[instruction.1].pop())
+                .map(|_| {
+                    stacks[instruction.1]
+                        .pop()
+                        .expect("There should be a box to move of the stack")
+                })
                 .collect::<Vec<_>>();
-            input.stacks[instruction.2].extend(ms.drain(..).rev())
+            stacks[instruction.2].extend(ms.drain(..).rev())
         }
 
-        input
-            .stacks
-            .into_iter()
-            .filter_map(|mut s| s.pop())
-            .collect()
+        stacks.into_iter().filter_map(|mut c| c.pop()).collect()
     }
 }
 
