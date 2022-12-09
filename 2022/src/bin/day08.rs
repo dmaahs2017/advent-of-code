@@ -267,7 +267,6 @@ mod day08_benchmarks {
     }
 
     #[bench]
-    #[ignore]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| p2::solve(input))
