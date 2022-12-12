@@ -5,6 +5,7 @@ use std::{str::FromStr, mem, fmt::Display};
 use aoc_2022::*;
 use anyhow::{Result, Error, Context, bail};
 use num_bigint::{BigUint, ToBigUint};
+// TODO: Part 2 requires math:  ring of integers modulo n
 
 const DAY: u8 = 11;
 
