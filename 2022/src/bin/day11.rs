@@ -4,6 +4,7 @@ use std::{str::FromStr, mem, fmt::Display};
 
 use aoc_2022::*;
 use anyhow::{Result, Error, Context, bail};
+use num_bigint::{BigUint, ToBigUint};
 
 const DAY: u8 = 11;
 
@@ -15,20 +16,21 @@ fn main() {
     );
 }
 
-type WorryLevel = usize;
+
+type Item = BigUint;
 
 #[derive(Debug)]
 enum Op {
     MulOld,
-    Add(WorryLevel),
-    Mul(WorryLevel),
+    Add(Item),
+    Mul(Item),
 }
 
 #[derive(Debug)]
 struct Monkey {
-    items: Vec<WorryLevel>,
+    items: Vec<Item>,
     op: Op,
-    test: WorryLevel,
+    test: Item,
     positive_target: usize,
     negative_target: usize,
     inspection_count: usize,
@@ -48,21 +50,21 @@ impl FromStr for Monkey {
 
         let items = item_line.get(18..).with_context(context)?.split(",")
             .map(|item| {
-                item.trim().parse::<WorryLevel>()
+                item.trim().parse::<Item>()
             }).collect::<Result<_, _>>()?;
 
         let op_parts = op_line.get(23..).with_context(context)?
             .split_once(" ").with_context(context)?;
         let op = match op_parts.0 {
             "*" => {
-                if let Ok(wl) = op_parts.1.parse::<WorryLevel>() {
+                if let Ok(wl) = op_parts.1.parse::<Item>() {
                     Op::Mul(wl)
                 } else {
                     Op::MulOld
                 }
             },
             "+" => {
-                if let Ok(wl) = op_parts.1.parse::<WorryLevel>() {
+                if let Ok(wl) = op_parts.1.parse::<Item>() {
                     Op::Add(wl)
                 } else {
                     bail!("Add Old is an unsuppored operation");
@@ -92,7 +94,8 @@ fn parse(input: &str) -> Result<Vec<Monkey>> {
 }
 
 struct KeepAwayGame {
-    monkeys: Vec<Monkey>
+    monkeys: Vec<Monkey>,
+    relief: bool,
 }
 
 impl Display for KeepAwayGame {
@@ -108,17 +111,20 @@ impl Display for KeepAwayGame {
 }
 
 impl Monkey {
-    fn throw_items(&mut self) -> Vec<(WorryLevel, usize)> {
+    fn throw_items(&mut self, relief: bool) -> Vec<(Item, usize)> {
         let items = mem::replace(&mut self.items, vec![]);
         self.inspection_count += items.len();
         items.into_iter().map(|mut item| {
-            match self.op {
-                Op::MulOld => item *= item,
+            match &self.op {
+                Op::MulOld => item = item.pow(2),
                 Op::Add(x) => item += x,
                 Op::Mul(x) => item *= x,
             };
-            item /= 3;
-            let target = if item % self.test == 0 {
+            if relief {
+                item /= 3.to_biguint().unwrap();
+            }
+            let x = &item % &self.test;
+            let target = if x == Default::default() {
                 self.positive_target
             } else {
                 self.negative_target
@@ -128,37 +134,31 @@ impl Monkey {
         }).collect()
     }
 
-    fn catch(&mut self, item: WorryLevel) {
+    fn catch(&mut self, item: Item) {
         self.items.push(item)
     }
 }
 
 
 impl KeepAwayGame {
-    fn new(monkeys: Vec<Monkey>) -> Self {
-        Self {monkeys}
+    fn new(monkeys: Vec<Monkey>, relief: bool) -> Self {
+        Self {monkeys, relief}
     }
 
     fn round(&mut self) {
         for idx in 0..self.monkeys.len() {
-            let items_and_targets = self.monkeys[idx].throw_items();
-            println!("\tMonkey {} throws: ", idx);
+            let items_and_targets = self.monkeys[idx].throw_items(self.relief);
             for (item, target) in items_and_targets {
-                println!("\t{} -> {}", item, target);
                 self.monkeys[target].catch(item);
             }
-            println!();
 
         }
     }
 
     fn rounds(&mut self, n: usize) {
-        println!("Initial State");
-        println!("{}", self);
         for i in 0..n {
+            println!("Starting Round {}", i);
             self.round();
-            println!("After Round {}", i + 1);
-            println!("{}", self)
         }
     }
 
@@ -177,16 +177,18 @@ impl KeepAwayGame {
 pub mod p1 {
     use super::*;
     pub fn solve(input: &str) -> usize {
-        let mut game = KeepAwayGame::new(parse(input).expect("Failed to parse input"));
-        dbg!(&game.monkeys[1]);
+        let mut game = KeepAwayGame::new(parse(input).expect("Failed to parse input"), true);
         game.rounds(20);
         game.monkey_business()
     }
 }
 
 pub mod p2 {
+    use super::*;
     pub fn solve(input: &str) -> usize {
-        input.len()
+        let mut game = KeepAwayGame::new(parse(input).expect("Failed to parse input"), false);
+        game.rounds(10000);
+        game.monkey_business()
     }
 }
 
@@ -204,13 +206,12 @@ mod day11_tests {
     #[test]
     fn p1_input() {
         let input = &read_input(DAY);
-        assert_eq!(p1::solve(input), 0)
+        assert_eq!(p1::solve(input), 66124)
     }
 
     #[test]
-    #[ignore]
     fn p2_sample() {
-        assert_eq!(p2::solve(SAMPLE), 0)
+        assert_eq!(p2::solve(SAMPLE), 2713310158)
     }
 
     #[test]
