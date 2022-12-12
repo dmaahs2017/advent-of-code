@@ -4,8 +4,6 @@ use std::{str::FromStr, mem, fmt::Display};
 
 use aoc_2022::*;
 use anyhow::{Result, Error, Context, bail};
-use num_bigint::{BigUint, ToBigUint};
-// TODO: Part 2 requires math:  ring of integers modulo n
 
 const DAY: u8 = 11;
 
@@ -18,7 +16,7 @@ fn main() {
 }
 
 
-type Item = BigUint;
+type Item = usize;
 
 #[derive(Debug)]
 enum Op {
@@ -96,6 +94,7 @@ fn parse(input: &str) -> Result<Vec<Monkey>> {
 
 struct KeepAwayGame {
     monkeys: Vec<Monkey>,
+    one_ring: usize,
     relief: bool,
 }
 
@@ -122,7 +121,7 @@ impl Monkey {
                 Op::Mul(x) => item *= x,
             };
             if relief {
-                item /= 3.to_biguint().unwrap();
+                item /= 3
             }
             let x = &item % &self.test;
             let target = if x == Default::default() {
@@ -143,13 +142,15 @@ impl Monkey {
 
 impl KeepAwayGame {
     fn new(monkeys: Vec<Monkey>, relief: bool) -> Self {
-        Self {monkeys, relief}
+        let one_ring = monkeys.iter().map(|m| m.test).reduce(|a, b| a * b).expect("Should have > 1 monkey");
+        Self {monkeys, relief, one_ring}
     }
 
     fn round(&mut self) {
         for idx in 0..self.monkeys.len() {
             let items_and_targets = self.monkeys[idx].throw_items(self.relief);
-            for (item, target) in items_and_targets {
+            for (mut item, target) in items_and_targets {
+                item %= self.one_ring;
                 self.monkeys[target].catch(item);
             }
 
@@ -157,8 +158,7 @@ impl KeepAwayGame {
     }
 
     fn rounds(&mut self, n: usize) {
-        for i in 0..n {
-            println!("Starting Round {}", i);
+        for _ in 0..n {
             self.round();
         }
     }
@@ -216,10 +216,9 @@ mod day11_tests {
     }
 
     #[test]
-    #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 0)
+        assert_eq!(p2::solve(input), 19309892877)
     }
 
 
