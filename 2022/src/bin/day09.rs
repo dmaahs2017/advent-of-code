@@ -10,14 +10,16 @@ fn main() {
     let input = &read_input(DAY);
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
-        DAY, p1::solve(input), p2::solve(input)
+        DAY,
+        p1::solve(input),
+        p2::solve(input)
     );
 }
 
 struct Simulation<const N_TAILS: usize> {
     head_pos: (isize, isize),
     tails: [(isize, isize); N_TAILS],
-    hits: HashSet<(isize, isize)>
+    hits: HashSet<(isize, isize)>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -29,18 +31,21 @@ enum Direction {
 }
 
 fn parse(input: &str) -> Vec<(Direction, usize)> {
-    input.lines().map(|l| {
-        let (d, c) = l.split_once(" ").unwrap();
-        let d = match d {
-            "R" => Direction::Right,
-            "U" => Direction::Up,
-            "D" => Direction::Down,
-            "L" => Direction::Left,
-            _ => panic!("Malformed input")
-        };
-        let c = c.parse().unwrap();
-        (d, c)
-    }).collect::<Vec<_>>()
+    input
+        .lines()
+        .map(|l| {
+            let (d, c) = l.split_once(" ").unwrap();
+            let d = match d {
+                "R" => Direction::Right,
+                "U" => Direction::Up,
+                "D" => Direction::Down,
+                "L" => Direction::Left,
+                _ => panic!("Malformed input"),
+            };
+            let c = c.parse().unwrap();
+            (d, c)
+        })
+        .collect::<Vec<_>>()
 }
 
 impl<const N_TAILS: usize> Simulation<N_TAILS> {
@@ -59,11 +64,7 @@ impl<const N_TAILS: usize> Simulation<N_TAILS> {
             for j in 0..26 {
                 if self.head_pos == (i, j) {
                     print!("H ")
-                } else if let Some(x) = self.tails
-                        .iter()
-                        .enumerate()
-                        .find(|x| *x.1 == (i, j))
-                {
+                } else if let Some(x) = self.tails.iter().enumerate().find(|x| *x.1 == (i, j)) {
                     print!("{} ", x.0);
                 } else {
                     print!(". ")
@@ -103,7 +104,7 @@ impl<const N_TAILS: usize> Simulation<N_TAILS> {
                 head = *tail;
                 target = prev;
             } else {
-                break
+                break;
             }
         }
         let last_tail = *self.tails.last().unwrap();
@@ -114,7 +115,6 @@ impl<const N_TAILS: usize> Simulation<N_TAILS> {
         let prev_head = self.head_pos;
         self.head_pos.0 -= 1;
         self.update_tails(prev_head);
-
     }
     fn move_down(&mut self) {
         let prev_head = self.head_pos;
@@ -132,17 +132,14 @@ impl<const N_TAILS: usize> Simulation<N_TAILS> {
         self.update_tails(prev_head);
     }
 
-
-
-
     fn count_unique_tail_visits(&self) -> usize {
         self.hits.len()
     }
 }
 
 fn is_adjacent(tail_pos: (isize, isize), to: (isize, isize)) -> bool {
-    (to.0.saturating_sub(1)..=to.0+1)
-        .flat_map(|i| std::iter::repeat(i).zip(to.1.saturating_sub(1) ..= to.1+1))
+    (to.0.saturating_sub(1)..=to.0 + 1)
+        .flat_map(|i| std::iter::repeat(i).zip(to.1.saturating_sub(1)..=to.1 + 1))
         .any(|pos| tail_pos == pos)
 }
 
@@ -169,7 +166,7 @@ pub mod p2 {
 #[cfg(test)]
 mod day09_tests {
     use super::*;
-    
+
     const SAMPLE: &str = include_str!("../../inputs/day09/sample.txt");
     const SAMPLE_2: &str = include_str!("../../inputs/day09/sample-2.txt");
 
@@ -201,8 +198,6 @@ mod day09_tests {
         assert!(p2::solve(input) < 4794);
         assert_eq!(p2::solve(input), 0);
     }
-
-
 }
 
 #[cfg(test)]
