@@ -115,21 +115,26 @@ impl Monkey {
         let items = mem::replace(&mut self.items, vec![]);
         self.inspection_count += items.len();
         items.into_iter().map(|mut item| {
+            // apply the monkey's operation to the worry level
             match &self.op {
                 Op::MulOld => item = item.pow(2),
                 Op::Add(x) => item += x,
                 Op::Mul(x) => item *= x,
             };
+
+            // apply relief to the worry level (if part 1)
             if relief {
                 item /= 3
             }
-            let x = &item % &self.test;
-            let target = if x == Default::default() {
+
+            // select target monkey based on the modulo test
+            let target = if item % self.test == 0 {
                 self.positive_target
             } else {
                 self.negative_target
             };
 
+            // return tuple of item and target
             (item, target)
         }).collect()
     }
