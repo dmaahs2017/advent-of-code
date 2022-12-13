@@ -1,7 +1,8 @@
 #![feature(test)]
 extern crate test;
+use anyhow::{bail, Context, Result};
 use aoc_2022::*;
-use anyhow::{Result, bail, Context};
+use pathfinding::prelude::astar;
 
 const DAY: u8 = 12;
 
@@ -9,102 +10,163 @@ fn main() {
     let input = &read_input(DAY);
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
-        DAY, p1::solve(input), p2::solve(input)
+        DAY,
+        p1::solve(input),
+        p2::solve(input)
     );
 }
 
-const START: Height = 0;
-const END: Height = 27;
-type Position = (usize, usize);
-type Height = u8;
-fn parse(input: &str) -> Result<(Position, Position, Vec<Vec<Height>>)> {
-    let grid: Vec<Vec<u8>> = input.lines()
+const START: u8 = 0;
+const LOW_LEVEL: u8 = 1;
+const END: u8 = 27;
+
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+struct Position {
+    row: usize,
+    col: usize,
+}
+
+impl Position {
+    fn new(row: usize, col: usize) -> Self {
+        Self { row, col }
+    }
+
+    fn distance(&self, other: &Self) -> usize {
+        self.row.abs_diff(other.row) + self.col.abs_diff(other.col)
+    }
+
+    fn successors(&self, grid: &[Vec<u8>]) -> Vec<(Position, usize)> {
+        let max_height = grid.len() - 1;
+        let max_width = grid[0].len() - 1;
+        let item = grid[self.row][self.col];
+        let mut successors = vec![];
+
+        // down
+        if self.row > 0 && grid[self.row - 1][self.col] <= item + 1 {
+            successors.push((Position::new(self.row - 1, self.col), 1));
+        }
+        // up
+        if self.row < max_height && grid[self.row + 1][self.col] <= item + 1 {
+            successors.push((Position::new(self.row + 1, self.col), 1));
+        }
+        // left
+        if self.col > 0 && grid[self.row][self.col - 1] <= item + 1 {
+            successors.push((Position::new(self.row, self.col - 1), 1));
+        }
+        // right
+        if self.col < max_width && grid[self.row][self.col + 1] <= item + 1 {
+            successors.push((Position::new(self.row, self.col + 1), 1));
+        }
+
+        successors
+    }
+}
+
+fn parse(input: &str) -> Result<Vec<Vec<u8>>> {
+    input
+        .lines()
         .map(|l| {
-            l.chars().map(|c| {
-                match c {
+            l.chars()
+                .map(|c| match c {
                     'a'..='z' => Ok(c as u8 - b'a' + 1),
                     'S' => Ok(START),
                     'E' => Ok(END),
                     _ => bail!("Unrecognized height mapping: {}", c),
-                }
-                
-            }).collect()
-        }).collect::<Result<_, _>>()?;
+                })
+                .collect()
+        })
+        .collect()
+}
 
-    let start = grid.iter()
+fn get_start(grid: &[Vec<u8>]) -> Result<Position> {
+    grid.iter()
         .enumerate()
         .find_map(|(x, row)| {
             if let Some(y) = row.iter().position(|c| *c == START) {
-                Some((x, y))
+                Some(Position::new(x, y))
             } else {
                 None
             }
-        }).with_context(|| "Grid should have a start")?;
+        })
+        .with_context(|| "Grid should have a start")
+}
 
-    let end = grid.iter()
+fn get_all_starts(grid: &[Vec<u8>]) -> Vec<Position> {
+    grid.iter()
+        .enumerate()
+        .flat_map(|(x, row)| {
+            row.iter()
+                .enumerate()
+                .filter_map(|(y, &c)| {
+                    if c == START || c == LOW_LEVEL {
+                        Some(Position::new(x, y))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect()
+}
+
+fn get_end(grid: &[Vec<u8>]) -> Result<Position> {
+    grid.iter()
         .enumerate()
         .find_map(|(x, row)| {
             if let Some(y) = row.iter().position(|c| *c == END) {
-                Some((x, y))
+                Some(Position::new(x, y))
             } else {
                 None
             }
-        }).with_context(|| "Grid should have an end")?;
-
-    Ok((start, end, grid))
+        })
+        .with_context(|| "Grid should have an end")
 }
 
-
 pub mod p1 {
-    use std::collections::HashSet;
-
     use super::*;
     pub fn solve(input: &str) -> usize {
-        let (start, end, grid) = parse(input).expect("Failed to parse input");
-        solve_rec(start, end, &grid, &mut Default::default())
-    }
+        let grid = parse(input).expect("Failed to parse input");
+        let start = get_start(&grid).unwrap();
+        let end = get_end(&grid).unwrap();
 
-    fn solve_rec(start: Position, end: Position, grid: &Vec<Vec<u8>>, visited: &mut HashSet<Position>) -> usize {
-        if visited.contains(&start) {
-            return 0
-        }
-        if start == end {
-            return 0
-        }
-        let sh = grid[start.0][start.1];
-        visited.insert(start);
-
-        let adjacent = (start.0.saturating_sub(1)..=start.0 + 1)
-            .zip(start.1.saturating_sub(1)..=start.1 + 1)
-            .filter(|p| *p != start);
-
-        let mut min = usize::MAX;
-        for (x, y) in adjacent {
-            dbg!(x, y);
-            if let Some(row) = grid.get(x) {
-                if let Some(h) = row.get(y) {
-                    dbg!(h, sh);
-                    if (*h as i8 - sh as i8).abs() < 2 {
-                        min = min.min( 1 + solve_rec((x, y), end, grid, visited) )
-                    }
-                }
-            }
-        }
-        visited.remove(&start);
-        return min;
+        astar(
+            &start,
+            |p| p.successors(&grid),
+            |p| p.distance(&end),
+            |p| p == &end,
+        )
+        .expect("Path not found")
+        .1
     }
 }
 
 pub mod p2 {
+    use super::*;
     pub fn solve(input: &str) -> usize {
-        input.len()
+        let grid = parse(input).expect("Failed to parse input");
+        let end = get_end(&grid).unwrap();
+        let starts = get_all_starts(&grid);
+
+        starts
+            .into_iter()
+            .filter_map(|start| {
+                astar(
+                    &start,
+                    |p| p.successors(&grid),
+                    |p| p.distance(&end),
+                    |p| p == &end,
+                )
+                .map(|p| p.1)
+            })
+            .min()
+            .unwrap()
     }
 }
 
 #[cfg(test)]
 mod day12_tests {
     use super::*;
-    
+
     const SAMPLE: &str = include_str!("../../inputs/day12/sample.txt");
 
     #[test]
@@ -113,26 +175,21 @@ mod day12_tests {
     }
 
     #[test]
-    #[ignore]
     fn p1_input() {
         let input = &read_input(DAY);
-        assert_eq!(p1::solve(input), 0)
+        assert_eq!(p1::solve(input), 437)
     }
 
     #[test]
-    #[ignore]
     fn p2_sample() {
-        assert_eq!(p2::solve(SAMPLE), 0)
+        assert_eq!(p2::solve(SAMPLE), 29)
     }
 
     #[test]
-    #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 0)
+        assert_eq!(p2::solve(input), 430)
     }
-
-
 }
 
 #[cfg(test)]
