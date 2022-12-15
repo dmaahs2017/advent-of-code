@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.66"
 pathfinding = "4.0.1"
+regex = "1.7.0"
