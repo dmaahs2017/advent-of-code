@@ -22,29 +22,18 @@ pub mod p1 {
                 let (id, game) = line.split_once(':').unwrap();
                 let id = id.split_once(' ').unwrap().1.parse::<usize>().unwrap();
 
-                let rounds = game
-                    .split(';')
-                    .map(|round| {
-                        round
-                            .split(',')
-                            .filter_map(|n_cubes| n_cubes.trim().split_once(' '))
-                            .fold((0, 0, 0), |mut acc, n_cube| {
-                                let n = n_cube.0.parse::<usize>().unwrap();
-                                match n_cube.1 {
-                                    "red" => acc.0 += n,
-                                    "green" => acc.1 += n,
-                                    "blue" => acc.2 += n,
-                                    _ => unreachable!("Should be no other colors"),
-                                };
-                                acc
-                            })
-                    })
-                    .collect::<Vec<_>>();
+                let all = game.split([',', ';']).all(|draw| {
+                    let (n, color) = draw.trim().split_once(' ').unwrap();
+                    let n = n.parse::<usize>().unwrap();
+                    match color {
+                        "red" => n <= 12,
+                        "green" => n <= 13,
+                        "blue" => n <= 14,
+                        _ => unreachable!("No other color"),
+                    }
+                });
 
-                if rounds
-                    .iter()
-                    .all(|round| round.0 <= 12 && round.1 <= 13 && round.2 <= 14)
-                {
+                if all {
                     Some(id)
                 } else {
                     None
