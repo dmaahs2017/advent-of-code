@@ -8,6 +8,7 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{line_ending, space1},
     multi::separated_list1,
+    sequence::pair,
     *,
 };
 use nom_supreme::ParserExt;
@@ -106,13 +107,9 @@ fn map(input: &str) -> IResult<&str, Map> {
 }
 
 fn parse_data(input: &str) -> IResult<&str, Data> {
-    let (rem, seeds) = seeds(input)?;
-
-    let (rem, maps) = separated_list1(line_ending, map).parse(rem)?;
-
-    let data = Data { seeds, maps };
-
-    Ok((rem, data))
+    pair(seeds, separated_list1(line_ending, map))
+        .map(|(seeds, maps)| Data { seeds, maps })
+        .parse(input)
 }
 
 pub mod p1 {
@@ -233,6 +230,7 @@ mod day05_benchmarks {
     }
 
     #[bench]
+    #[ignore]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| p2::solve(input))

@@ -145,7 +145,6 @@ pub mod p2 {
                 .filter_map(|pos| number_map.get(&pos))
                 .collect::<HashSet<_>>();
 
-
                 if gears.len() == 2 {
                     Some(
                         gears
