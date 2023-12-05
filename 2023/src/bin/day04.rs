@@ -57,8 +57,8 @@ pub mod p2 {
         let mut counts = vec![1; scores.len()];
 
         for i in 0..scores.len() {
-            for awarded in i + 1..=scores[i] + i {
-                counts[awarded] += counts[i];
+            for awarded_index in i + 1..=scores[i] + i {
+                counts[awarded_index] += counts[i];
             }
         }
 
