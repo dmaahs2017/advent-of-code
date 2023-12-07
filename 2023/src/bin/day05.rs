@@ -2,7 +2,7 @@
 extern crate test;
 use aoc_2023::*;
 
-use indicatif::ProgressIterator;
+use indicatif::*;
 use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{line_ending, space1},
@@ -137,7 +137,12 @@ pub mod p2 {
                     .min()
                     .unwrap()
             })
-            .progress()
+            .progress_with_style(
+                ProgressStyle::with_template(
+                    "Day 05: [{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
+                )
+                .unwrap(),
+            )
             .min()
             .unwrap()
     }
