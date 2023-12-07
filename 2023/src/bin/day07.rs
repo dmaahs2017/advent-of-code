@@ -16,12 +16,26 @@ fn main() {
     );
 }
 
-type Rank = u8;
+#[derive(Copy, Clone)]
+enum FaceRank {
+    Ace = 14,
+    King = 13,
+    Queen = 12,
+    Jack = 11,
+    Ten = 10,
+    Wild = 1,
+}
+
+impl FaceRank {
+    fn as_u8(&self) -> u8 {
+        *self as u8
+    }
+}
 
 #[derive(Eq, PartialEq, Debug)]
 struct Hand {
     bid: u64,
-    cards: Vec<Rank>,
+    cards: Vec<u8>,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
@@ -36,27 +50,24 @@ enum HandType {
 }
 
 impl Hand {
-    fn new(cards: Vec<Rank>, bid: u64) -> Self {
+    fn new(cards: Vec<u8>, bid: u64) -> Self {
         Self { cards, bid }
     }
-    fn hand_type(&self) -> HandType {
-        use HandType::*;
-        let counts = self.cards.iter().counts().values().sorted().join("");
-        match counts.as_str() {
-            "5" => FiveOfKind,
-            "14" => FourOfKind,
-            "23" => FullHouse,
-            "113" => ThreeOfKind,
-            "122" => TwoPair,
-            "1112" => OnePair,
-            _ => HighCard,
+
+    fn jacks_to_wild(&mut self) {
+        for c in self
+            .cards
+            .iter_mut()
+            .filter(|c| **c == FaceRank::Jack.as_u8())
+        {
+            *c = FaceRank::Wild.as_u8();
         }
     }
 
-    fn hand_type_wild(&self) -> HandType {
+    fn hand_type(&self) -> HandType {
         use HandType::*;
         let mut map = self.cards.iter().counts();
-        let wilds = map.remove(&1).unwrap_or_default();
+        let wilds = map.remove(&FaceRank::Wild.as_u8()).unwrap_or_default();
 
         if wilds == 5 {
             return FiveOfKind;
@@ -84,61 +95,32 @@ impl Hand {
     }
 }
 
-fn parse(input: &str) -> Vec<Hand> {
-    input
-        .lines()
-        .map(|line| {
-            let (cards, bid) = line.split_once(' ').unwrap();
-            let cards = cards
-                .chars()
-                .map(|c| {
-                    c.to_digit(10).unwrap_or_else(|| match c {
-                        'A' => 14,
-                        'K' => 13,
-                        'Q' => 12,
-                        'J' => 11,
-                        'T' => 10,
-                        _ => unreachable!(),
-                    }) as u8
-                })
-                .collect();
+fn parse(input: &str) -> impl Iterator<Item = Hand> + '_ {
+    input.lines().map(|line| {
+        let (cards, bid) = line.split_once(' ').unwrap();
+        let cards = cards
+            .chars()
+            .map(|c| {
+                c.to_digit(10).unwrap_or_else(|| match c {
+                    'A' => FaceRank::Ace as u32,
+                    'K' => FaceRank::King as u32,
+                    'Q' => FaceRank::Queen as u32,
+                    'J' => FaceRank::Jack as u32,
+                    'T' => FaceRank::Ten as u32,
+                    _ => unreachable!(),
+                }) as u8
+            })
+            .collect();
 
-            let bid = bid.parse().unwrap();
-            Hand::new(cards, bid)
-        })
-        .collect()
-}
-
-fn parse_wild(input: &str) -> Vec<Hand> {
-    input
-        .lines()
-        .map(|line| {
-            let (cards, bid) = line.split_once(' ').unwrap();
-            let cards = cards
-                .chars()
-                .map(|c| {
-                    c.to_digit(10).unwrap_or_else(|| match c {
-                        'A' => 14,
-                        'K' => 13,
-                        'Q' => 12,
-                        'J' => 1,
-                        'T' => 10,
-                        _ => unreachable!(),
-                    }) as u8
-                })
-                .collect();
-
-            let bid = bid.parse().unwrap();
-            Hand::new(cards, bid)
-        })
-        .collect()
+        let bid = bid.parse().unwrap();
+        Hand::new(cards, bid)
+    })
 }
 
 pub mod p1 {
     use super::*;
     pub fn solve(input: &str) -> u64 {
         parse(input)
-            .into_iter()
             .sorted_by_key(|h| (h.hand_type(), h.cards.clone()))
             .enumerate()
             .map(|(i, hand)| (i as u64 + 1) * hand.bid)
@@ -149,9 +131,12 @@ pub mod p1 {
 pub mod p2 {
     use super::*;
     pub fn solve(input: &str) -> u64 {
-        parse_wild(input)
-            .iter()
-            .sorted_by_key(|h| (h.hand_type_wild(), h.cards.clone()))
+        parse(input)
+            .map(|mut h| {
+                h.jacks_to_wild();
+                h
+            })
+            .sorted_by_key(|h| (h.hand_type(), h.cards.clone()))
             .enumerate()
             .map(|(i, hand)| (i as u64 + 1) * hand.bid)
             .sum()
@@ -166,7 +151,7 @@ mod day07_tests {
 
     #[test]
     fn test_parse_sample() {
-        let hands = parse(SAMPLE);
+        let hands = parse(SAMPLE).collect::<Vec<_>>();
         let e = vec![
             Hand::new(vec![3, 2, 10, 3, 13], 765),
             Hand::new(vec![10, 5, 5, 11, 5], 684),
