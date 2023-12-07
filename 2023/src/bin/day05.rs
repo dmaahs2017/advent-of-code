@@ -2,7 +2,6 @@
 extern crate test;
 use aoc_2023::*;
 
-use rayon::prelude::*;
 use indicatif::ProgressIterator;
 use nom::{
     bytes::complete::{tag, take_until},
@@ -12,6 +11,7 @@ use nom::{
     *,
 };
 use nom_supreme::ParserExt;
+use rayon::prelude::*;
 
 const DAY: u8 = 5;
 
