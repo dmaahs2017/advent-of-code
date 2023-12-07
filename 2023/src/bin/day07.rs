@@ -18,12 +18,12 @@ fn main() {
 
 #[derive(Copy, Clone)]
 enum FaceRank {
-    Ace = 14,
-    King = 13,
-    Queen = 12,
-    Jack = 11,
-    Ten = 10,
     Wild = 1,
+    Ten = 10,
+    Jack,
+    Queen,
+    King,
+    Ace,
 }
 
 impl FaceRank {
