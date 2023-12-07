@@ -3,7 +3,7 @@ extern crate test;
 use aoc_2023::*;
 
 use rayon::prelude::*;
-
+use indicatif::ProgressIterator;
 use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{line_ending, space1},
@@ -137,6 +137,7 @@ pub mod p2 {
                     .min()
                     .unwrap()
             })
+            .progress()
             .min()
             .unwrap()
     }
