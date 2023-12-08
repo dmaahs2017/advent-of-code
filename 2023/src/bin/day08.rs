@@ -15,6 +15,38 @@ use std::collections::*;
 
 const DAY: u8 = 8;
 
+fn main() {
+    let input = &read_input(DAY);
+    println!(
+        "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
+        DAY,
+        solve_p1(input),
+        solve_p2(input),
+    );
+}
+
+pub fn solve_p1(input: &str) -> usize {
+    let (_, dm) = parse(input).unwrap();
+    dm.path_len("AAA", |s| s == "ZZZ")
+}
+
+
+pub fn solve_p2(input: &str) -> usize {
+    let (_, dm) = parse(input).unwrap();
+
+    let ns = dm
+        .map
+        .keys()
+        .cloned()
+        .filter(|k| k.ends_with('A'))
+        .map(|current| {
+            dm.path_len(current, |s| s.ends_with('Z'))
+        })
+        .collect_vec();
+
+    lcm(&ns)
+}
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 enum Direction {
     Left,
@@ -30,6 +62,24 @@ struct DessertMap<'a> {
 impl<'a> DessertMap<'a> {
     fn new(directions: Vec<Direction>, map: HashMap<&'a str, (&'a str, &'a str)>) -> Self {
         Self { directions, map }
+    }
+
+    fn path_len<'b, F>(&self, mut start: &'b str, is_end_node: F) -> usize 
+    where 'a: 'b,
+          F: Fn(&str) -> bool
+    {
+        self.directions
+            .iter()
+            .cycle()
+            .enumerate()
+            .find_map(|(index, dir)| {
+                start = match dir {
+                    Direction::Left => self.map[start].0,
+                    Direction::Right => self.map[start].1,
+                };
+                is_end_node(start).then_some(index + 1)
+            })
+            .expect("A start node should always have an end node")
     }
 }
 
@@ -68,83 +118,24 @@ fn parse(input: &str) -> IResult<&str, DessertMap> {
     .parse(input)
 }
 
-fn main() {
-    let input = &read_input(DAY);
-    println!(
-        "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
-        DAY,
-        p1::solve(input),
-        p2::solve(input),
-    );
+fn lcm(ns: &[usize]) -> usize {
+    if ns.len() == 1 {
+        return ns[0];
+    }
+
+    let a = ns[0];
+    let b = lcm(&ns[1..]);
+    a * b / gcd(a, b)
 }
 
-pub mod p1 {
-    use super::*;
-    pub fn solve(input: &str) -> usize {
-        let (_, dm) = parse(input).unwrap();
-
-        let mut current = "AAA";
-        dm.directions
-            .into_iter()
-            .cycle()
-            .enumerate()
-            .find_map(|(index, dir)| {
-                current = match dir {
-                    Direction::Left => dm.map[current].0,
-                    Direction::Right => dm.map[current].1,
-                };
-                (current == "ZZZ").then_some(index + 1)
-            })
-            .unwrap()
+fn gcd(a: usize, b: usize) -> usize {
+    if b == 0 {
+        return a;
     }
+    gcd(b, a % b)
 }
 
-pub mod p2 {
-    use super::*;
-    pub fn solve(input: &str) -> usize {
-        let (_, dm) = parse(input).unwrap();
 
-        let ns = dm
-            .map
-            .keys()
-            .cloned()
-            .filter(|k| k.ends_with('A'))
-            .map(|mut current| {
-                dm.directions
-                    .iter()
-                    .cycle()
-                    .enumerate()
-                    .find_map(|(index, dir)| {
-                        current = match dir {
-                            Direction::Left => dm.map[current].0,
-                            Direction::Right => dm.map[current].1,
-                        };
-                        current.ends_with('Z').then_some(index + 1)
-                    })
-                    .expect("A start node should always has a path to the end")
-            })
-            .collect_vec();
-
-        lcm(&ns)
-    }
-
-    fn lcm(ns: &[usize]) -> usize {
-        if ns.len() == 1 {
-            return ns[0];
-        }
-
-        let a = ns[0];
-        let b = lcm(&ns[1..]);
-        a * b / gcd(a, b)
-    }
-
-    fn gcd(a: usize, b: usize) -> usize {
-        if b == 0 {
-            return a;
-        }
-        gcd(b, a % b)
-    }
-}
 
 #[cfg(test)]
 mod day08_tests {
@@ -172,24 +163,24 @@ mod day08_tests {
 
     #[test]
     fn p1_sample() {
-        assert_eq!(p1::solve(SAMPLE), 2)
+        assert_eq!(solve_p1(SAMPLE), 2)
     }
 
     #[test]
     fn p1_input() {
         let input = &read_input(DAY);
-        assert_eq!(p1::solve(input), 19667)
+        assert_eq!(solve_p1(input), 19667)
     }
 
     #[test]
     fn p2_sample() {
-        assert_eq!(p2::solve(SAMPLE_2), 6)
+        assert_eq!(solve_p2(SAMPLE_2), 6)
     }
 
     #[test]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 19185263738117)
+        assert_eq!(solve_p2(input), 19185263738117)
     }
 }
 
@@ -202,13 +193,13 @@ mod day08_benchmarks {
     #[ignore]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p1::solve(input))
+        b.iter(|| solve_p1(input))
     }
 
     #[bench]
     #[ignore]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p2::solve(input))
+        b.iter(|| solve_p1(input))
     }
 }
