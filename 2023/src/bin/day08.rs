@@ -39,8 +39,8 @@ pub fn solve_p2(input: &str) -> usize {
         .keys()
         .cloned()
         .filter(|k| k.ends_with('A'))
-        .map(|current| {
-            dm.path_len(current, |s| s.ends_with('Z'))
+        .map(|start_node| {
+            dm.path_len(start_node, |s| s.ends_with('Z'))
         })
         .collect_vec();
 
