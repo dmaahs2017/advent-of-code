@@ -11,8 +11,8 @@ fn main() {
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
         DAY,
-        p1::solve(input),
-        p2::solve(input)
+        solve_p1(input),
+        solve_p2(input)
     );
 }
 
@@ -37,38 +37,34 @@ fn parse_cards(input: &str) -> Vec<Card> {
         .collect()
 }
 
-pub mod p1 {
-    use super::*;
-    pub fn solve(input: &str) -> usize {
-        let cards = parse_cards(input);
-        cards.iter().map(score).sum()
-    }
-
+pub fn solve_p1(input: &str) -> usize {
     fn score(card: &Card) -> usize {
         let n_winners = card.values.intersection(&card.winning_values).count() as u32;
         2usize.pow(n_winners) >> 1
     }
+
+    let cards = parse_cards(input);
+    cards.iter().map(score).sum()
 }
 
-pub mod p2 {
-    use super::*;
-    pub fn solve(input: &str) -> usize {
-        let scores = parse_cards(input).iter().map(score).collect::<Vec<_>>();
-        let mut counts = vec![1; scores.len()];
 
-        for i in 0..scores.len() {
-            for awarded_index in i + 1..=scores[i] + i {
-                counts[awarded_index] += counts[i];
-            }
-        }
-
-        counts.iter().sum()
-    }
-
+pub fn solve_p2(input: &str) -> usize {
     fn score(card: &Card) -> usize {
         card.values.intersection(&card.winning_values).count()
     }
+
+    let scores = parse_cards(input).iter().map(score).collect::<Vec<_>>();
+    let mut counts = vec![1; scores.len()];
+
+    for i in 0..scores.len() {
+        for awarded_index in i + 1..=scores[i] + i {
+            counts[awarded_index] += counts[i];
+        }
+    }
+
+    counts.iter().sum()
 }
+
 
 #[cfg(test)]
 mod day04_tests {
@@ -78,24 +74,24 @@ mod day04_tests {
 
     #[test]
     fn p1_sample() {
-        assert_eq!(p1::solve(SAMPLE), 13)
+        assert_eq!(solve_p1(SAMPLE), 13)
     }
 
     #[test]
     fn p1_input() {
         let input = &read_input(DAY);
-        assert_eq!(p1::solve(input), 32001)
+        assert_eq!(solve_p1(input), 32001)
     }
 
     #[test]
     fn p2_sample() {
-        assert_eq!(p2::solve(SAMPLE), 30)
+        assert_eq!(solve_p2(SAMPLE), 30)
     }
 
     #[test]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 5037841)
+        assert_eq!(solve_p2(input), 5037841)
     }
 }
 
@@ -107,12 +103,12 @@ mod day04_benchmarks {
     #[bench]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p1::solve(input))
+        b.iter(|| solve_p1(input))
     }
 
     #[bench]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p2::solve(input))
+        b.iter(|| solve_p2(input))
     }
 }

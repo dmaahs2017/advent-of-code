@@ -24,8 +24,8 @@ fn main() {
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
         DAY,
-        p1::solve(input),
-        p2::solve(input)
+        solve_p1(input),
+        solve_p2(input)
     );
 }
 
@@ -61,103 +61,97 @@ fn parse_grid(input: Span) -> IResult<Span, Vec<Token>> {
     res.map(|(input, _)| (input, parsed))
 }
 
-pub mod p1 {
-    use super::*;
-    pub fn solve(input: &str) -> u32 {
-        let tokens = parse_grid(Span::new(input)).unwrap().1;
+pub fn solve_p1(input: &str) -> u32 {
+    let tokens = parse_grid(Span::new(input)).unwrap().1;
 
-        let symbol_map = tokens
-            .iter()
-            .filter_map(|token| match token {
-                Token::Symbol(s) => Some(s.extra),
-                _ => None,
-            })
-            .collect::<HashSet<_>>();
+    let symbol_map = tokens
+        .iter()
+        .filter_map(|token| match token {
+            Token::Symbol(s) => Some(s.extra),
+            _ => None,
+        })
+        .collect::<HashSet<_>>();
 
-        tokens
-            .iter()
-            .filter_map(|token| {
-                let Token::Number(num) = token else {
-                    return None;
-                };
+    tokens
+        .iter()
+        .filter_map(|token| {
+            let Token::Number(num) = token else {
+                return None;
+            };
 
-                let num_len = num.fragment().len() as i32;
+            let num_len = num.fragment().len() as i32;
 
-                [
-                    // east border
-                    IVec2::new(num_len, 0),
-                    // west border
-                    IVec2::new(-1, 0),
-                ]
-                .into_iter()
-                .chain(
-                    //north border
-                    (-1..=num_len).map(|x| IVec2::new(x, 1)),
-                )
-                .chain(
-                    // south border
-                    (-1..=num_len).map(|x| IVec2::new(x, -1)),
-                )
-                .map(|offset| offset + num.extra)
-                .any(|pos| symbol_map.contains(&pos))
-                .then(|| num.parse::<u32>().unwrap())
-            })
-            .sum()
-    }
+            [
+                // east border
+                IVec2::new(num_len, 0),
+                // west border
+                IVec2::new(-1, 0),
+            ]
+            .into_iter()
+            .chain(
+                //north border
+                (-1..=num_len).map(|x| IVec2::new(x, 1)),
+            )
+            .chain(
+                // south border
+                (-1..=num_len).map(|x| IVec2::new(x, -1)),
+            )
+            .map(|offset| offset + num.extra)
+            .any(|pos| symbol_map.contains(&pos))
+            .then(|| num.parse::<u32>().unwrap())
+        })
+        .sum()
 }
 
-pub mod p2 {
-    use super::*;
-    pub fn solve(input: &str) -> usize {
-        let tokens = parse_grid(Span::new(input)).unwrap().1;
+pub fn solve_p2(input: &str) -> usize {
+    let tokens = parse_grid(Span::new(input)).unwrap().1;
 
-        let number_map = tokens
-            .iter()
-            .filter_map(|t| match t {
-                Token::Number(n) => Some(n),
-                _ => None,
-            })
-            .flat_map(|num| {
-                (num.extra.x..num.extra.x + num.len() as i32)
-                    .map(move |x| (IVec2::new(x, num.extra.y), num))
-            })
-            .collect::<HashMap<_, _>>();
+    let number_map = tokens
+        .iter()
+        .filter_map(|t| match t {
+            Token::Number(n) => Some(n),
+            _ => None,
+        })
+        .flat_map(|num| {
+            (num.extra.x..num.extra.x + num.len() as i32)
+                .map(move |x| (IVec2::new(x, num.extra.y), num))
+        })
+        .collect::<HashMap<_, _>>();
 
-        tokens
-            .iter()
-            .filter_map(|token| {
-                let Token::Symbol(sym) = token else {
-                    return None;
-                };
+    tokens
+        .iter()
+        .filter_map(|token| {
+            let Token::Symbol(sym) = token else {
+                return None;
+            };
 
-                let gears = [
-                    IVec2::new(-1, 0),
-                    IVec2::new(1, 0),
-                    IVec2::new(0, -1),
-                    IVec2::new(0, 1),
-                    IVec2::new(1, 1),
-                    IVec2::new(1, -1),
-                    IVec2::new(-1, 1),
-                    IVec2::new(-1, -1),
-                ]
-                .into_iter()
-                .map(|offset| offset + sym.extra)
-                .filter_map(|pos| number_map.get(&pos))
-                .collect::<HashSet<_>>();
+            let gears = [
+                IVec2::new(-1, 0),
+                IVec2::new(1, 0),
+                IVec2::new(0, -1),
+                IVec2::new(0, 1),
+                IVec2::new(1, 1),
+                IVec2::new(1, -1),
+                IVec2::new(-1, 1),
+                IVec2::new(-1, -1),
+            ]
+            .into_iter()
+            .map(|offset| offset + sym.extra)
+            .filter_map(|pos| number_map.get(&pos))
+            .collect::<HashSet<_>>();
 
-                if gears.len() == 2 {
-                    Some(
-                        gears
-                            .iter()
-                            .map(|g| g.parse::<usize>().unwrap())
-                            .product::<usize>(),
-                    )
-                } else {
-                    None
-                }
-            })
-            .sum()
-    }
+            if gears.len() == 2 {
+                Some(
+                    gears
+                        .iter()
+                        .map(|g| g.parse::<usize>().unwrap())
+                        .product::<usize>(),
+                )
+            } else {
+                None
+            }
+        })
+        .sum()
 }
 
 #[cfg(test)]
@@ -170,34 +164,34 @@ mod day03_tests {
 
     #[test]
     fn p1_sample() {
-        assert_eq!(p1::solve(SAMPLE), 4361)
+        assert_eq!(solve_p1(SAMPLE), 4361)
     }
 
     #[test]
     fn p1_edge() {
-        assert_eq!(p1::solve(SAMPLE_2), 0)
+        assert_eq!(solve_p1(SAMPLE_2), 0)
     }
 
     #[test]
     fn p1_input() {
         let input = &read_input(DAY);
-        assert_eq!(p1::solve(input), 530495)
+        assert_eq!(solve_p1(input), 530495)
     }
 
     #[test]
     fn p2_sample() {
-        assert_eq!(p2::solve(SAMPLE), 467835)
+        assert_eq!(solve_p2(SAMPLE), 467835)
     }
 
     #[test]
     fn p2_edge() {
-        assert_eq!(p2::solve(SAMPLE_3), 81)
+        assert_eq!(solve_p2(SAMPLE_3), 81)
     }
 
     #[test]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 80253814)
+        assert_eq!(solve_p2(input), 80253814)
     }
 }
 
@@ -209,12 +203,12 @@ mod day03_benchmarks {
     #[bench]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p1::solve(input))
+        b.iter(|| solve_p1(input))
     }
 
     #[bench]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p2::solve(input))
+        b.iter(|| solve_p2(input))
     }
 }

@@ -20,8 +20,8 @@ fn main() {
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
         DAY,
-        p1::solve(input),
-        p2::solve(input)
+        solve_p1(input),
+        solve_p2(input)
     );
 }
 
@@ -112,40 +112,34 @@ fn parse_data(input: &str) -> IResult<&str, Data> {
         .parse(input)
 }
 
-pub mod p1 {
-    use super::*;
-    pub fn solve(input: &str) -> u64 {
-        let (_, data) = parse_data(input).unwrap();
-        data.seeds
-            .iter()
-            .map(|seed| data.get_seed_location(*seed))
-            .min()
-            .unwrap()
-    }
+pub fn solve_p1(input: &str) -> u64 {
+    let (_, data) = parse_data(input).unwrap();
+    data.seeds
+        .iter()
+        .map(|seed| data.get_seed_location(*seed))
+        .min()
+        .unwrap()
 }
 
-pub mod p2 {
-    use super::*;
-    pub fn solve(input: &str) -> u64 {
-        let (_, data) = parse_data(input).unwrap();
-        data.seeds
-            .chunks(2)
-            .map(|sp| {
-                (sp[0]..sp[0] + sp[1])
-                    .into_par_iter()
-                    .map(|seed| data.get_seed_location(seed))
-                    .min()
-                    .unwrap()
-            })
-            .progress_with_style(
-                ProgressStyle::with_template(
-                    "Day 05: [{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
-                )
-                .unwrap(),
+pub fn solve_p2(input: &str) -> u64 {
+    let (_, data) = parse_data(input).unwrap();
+    data.seeds
+        .chunks(2)
+        .map(|sp| {
+            (sp[0]..sp[0] + sp[1])
+                .into_par_iter()
+                .map(|seed| data.get_seed_location(seed))
+                .min()
+                .unwrap()
+        })
+        .progress_with_style(
+            ProgressStyle::with_template(
+                "Day 05: [{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}",
             )
-            .min()
-            .unwrap()
-    }
+            .unwrap(),
+        )
+        .min()
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -156,7 +150,7 @@ mod day05_tests {
 
     #[test]
     fn p1_sample() {
-        assert_eq!(p1::solve(SAMPLE), 35)
+        assert_eq!(solve_p1(SAMPLE), 35)
     }
 
     #[test]
@@ -208,19 +202,19 @@ mod day05_tests {
     #[test]
     fn p1_input() {
         let input = &read_input(DAY);
-        assert_eq!(p1::solve(input), 323142486)
+        assert_eq!(solve_p1(input), 323142486)
     }
 
     #[test]
     fn p2_sample() {
-        assert_eq!(p2::solve(SAMPLE), 46)
+        assert_eq!(solve_p2(SAMPLE), 46)
     }
 
     #[test]
     #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(p2::solve(input), 79874951)
+        assert_eq!(solve_p2(input), 79874951)
     }
 }
 
@@ -232,13 +226,13 @@ mod day05_benchmarks {
     #[bench]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p1::solve(input))
+        b.iter(|| solve_p1(input))
     }
 
     #[bench]
     #[ignore]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
-        b.iter(|| p2::solve(input))
+        b.iter(|| solve_p2(input))
     }
 }
