@@ -105,14 +105,12 @@ mod day09_benchmarks {
     use test::Bencher;
 
     #[bench]
-    #[ignore]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| solve_p1(input))
     }
 
     #[bench]
-    #[ignore]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| solve_p2(input))
