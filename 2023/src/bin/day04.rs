@@ -47,7 +47,6 @@ pub fn solve_p1(input: &str) -> usize {
     cards.iter().map(score).sum()
 }
 
-
 pub fn solve_p2(input: &str) -> usize {
     fn score(card: &Card) -> usize {
         card.values.intersection(&card.winning_values).count()
@@ -64,7 +63,6 @@ pub fn solve_p2(input: &str) -> usize {
 
     counts.iter().sum()
 }
-
 
 #[cfg(test)]
 mod day04_tests {

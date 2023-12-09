@@ -30,7 +30,6 @@ pub fn solve_p1(input: &str) -> usize {
     dm.path_len("AAA", |s| s == "ZZZ")
 }
 
-
 pub fn solve_p2(input: &str) -> usize {
     let (_, dm) = parse(input).unwrap();
 
@@ -39,9 +38,7 @@ pub fn solve_p2(input: &str) -> usize {
         .keys()
         .cloned()
         .filter(|k| k.ends_with('A'))
-        .map(|start_node| {
-            dm.path_len(start_node, |s| s.ends_with('Z'))
-        })
+        .map(|start_node| dm.path_len(start_node, |s| s.ends_with('Z')))
         .collect_vec();
 
     lcm(&ns)
@@ -64,9 +61,10 @@ impl<'a> DessertMap<'a> {
         Self { directions, map }
     }
 
-    fn path_len<'b, F>(&self, mut start: &'b str, is_end_node: F) -> usize 
-    where 'a: 'b,
-          F: Fn(&str) -> bool
+    fn path_len<'b, F>(&self, mut start: &'b str, is_end_node: F) -> usize
+    where
+        'a: 'b,
+        F: Fn(&str) -> bool,
     {
         self.directions
             .iter()
@@ -134,8 +132,6 @@ fn gcd(a: usize, b: usize) -> usize {
     }
     gcd(b, a % b)
 }
-
-
 
 #[cfg(test)]
 mod day08_tests {
