@@ -18,7 +18,7 @@ fn main() {
 }
 
 pub fn solve_p1(input: &str) -> usize {
-    process(input, 1)
+    process(input, 2)
 
 }
 
@@ -39,8 +39,8 @@ fn process(input: &str, scale: usize) -> usize {
 
     let galaxy_positions = iter_absolute_galaxy_positions(&lines)
         .map(|pos| {
-            let offset_y = (0..pos.y).filter(|y| expanded_rows.contains(y)).count() * scale;
-            let offset_x = (0..pos.x).filter(|x| expanded_cols.contains(x)).count() * scale;
+            let offset_y = (0..pos.y).filter(|y| expanded_rows.contains(y)).count() * ( scale -1 );
+            let offset_x = (0..pos.x).filter(|x| expanded_cols.contains(x)).count() * ( scale -1 );
             let offset = IVec2::new(offset_x as i32, offset_y as i32);
             println!("pos {:?} + offset {:?} = {:?}", pos, offset, pos+offset);
             pos + offset
@@ -89,15 +89,15 @@ mod day11_tests {
 
     #[test]
     fn p2_sample() {
+        //assert_eq!(process(SAMPLE, 2), 1030);
         assert_eq!(process(SAMPLE, 10), 1030);
         assert_eq!(process(SAMPLE, 100), 8410);
     }
 
     #[test]
-    #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(solve_p2(input), 0)
+        assert_eq!(solve_p2(input), 593821230983)
     }
 }
 
@@ -107,14 +107,12 @@ mod day11_benchmarks {
     use test::Bencher;
 
     #[bench]
-    #[ignore]
     fn bench_p1(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| solve_p1(input))
     }
 
     #[bench]
-    #[ignore]
     fn bench_p2(b: &mut Bencher) {
         let input = &read_input(DAY);
         b.iter(|| solve_p2(input))
