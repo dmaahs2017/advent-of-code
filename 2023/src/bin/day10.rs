@@ -117,7 +117,6 @@ fn traverse(map: &[Vec<Tile>]) -> Vec<IVec2> {
     }
 }
 
-
 pub fn solve_p2(input: &str) -> usize {
     use Tile::*;
     let map = parse(input);
