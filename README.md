@@ -22,6 +22,8 @@
 
 ## Stars ⭐ 
 <!--- advent_readme_stars table 2022 --->
+
+<!--- advent_readme_stars table 2022 --->
  2022 Results
 
 | Day | Part 1 | Part 2 |
