@@ -1,14 +1,8 @@
 #![feature(test)]
 extern crate test;
 use aoc_2024::*;
+use nom::{character::complete as character, multi::*, sequence::*, IResult};
 use std::collections::HashMap;
-use nom::{
-    IResult,
-    character::complete as character,
-    multi::*,
-    sequence::*,
-
-};
 
 const DAY: u8 = 1;
 
@@ -16,14 +10,17 @@ fn main() {
     let input = &read_input(DAY);
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
-        DAY, solve_p1(input), solve_p2(input)
+        DAY,
+        solve_p1(input),
+        solve_p2(input)
     );
 }
 
-fn parse(s: &str) -> IResult<&str, Vec<(u64,u64)>> {
-    separated_list1(character::line_ending, separated_pair(
-        character::u64, character::space1, character::u64
-    ))(s)
+fn parse(s: &str) -> IResult<&str, Vec<(u64, u64)>> {
+    separated_list1(
+        character::line_ending,
+        separated_pair(character::u64, character::space1, character::u64),
+    )(s)
 }
 
 pub fn solve_p1(input: &str) -> u64 {
@@ -31,25 +28,32 @@ pub fn solve_p1(input: &str) -> u64 {
     a.sort();
     b.sort();
 
-    a.into_iter().zip(b.into_iter()).map(|(a, b)| a.abs_diff(b)).sum()
+    a.into_iter()
+        .zip(b.into_iter())
+        .map(|(a, b)| a.abs_diff(b))
+        .sum()
 }
 
 pub fn solve_p2(input: &str) -> u64 {
-    let ( left, right ): (Vec<_>, Vec<_>) = parse(input).unwrap().1.into_iter().unzip();
+    let (left, right): (Vec<_>, Vec<_>) = parse(input).unwrap().1.into_iter().unzip();
 
-    let multipliers_map = right.into_iter().fold(HashMap::new(), |mut acc: HashMap<u64, u64>, n| {
-        *acc.entry(n).or_default() += 1;
-        acc
-    });
+    let multipliers_map =
+        right
+            .into_iter()
+            .fold(HashMap::new(), |mut acc: HashMap<u64, u64>, n| {
+                *acc.entry(n).or_default() += 1;
+                acc
+            });
 
-    left.into_iter().map(|n| n * multipliers_map.get(&n).unwrap_or(&0u64)).sum()
-
+    left.into_iter()
+        .map(|n| n * multipliers_map.get(&n).unwrap_or(&0u64))
+        .sum()
 }
 
 #[cfg(test)]
 mod day01_tests {
     use super::*;
-    
+
     const SAMPLE: &str = include_str!("../../inputs/day01/sample.txt");
 
     #[test]
@@ -73,8 +77,6 @@ mod day01_tests {
         let input = &read_input(DAY);
         assert_eq!(solve_p2(input), 18567089)
     }
-
-
 }
 
 #[cfg(test)]
