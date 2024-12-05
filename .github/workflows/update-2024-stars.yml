@@ -1,4 +1,4 @@
-name: Update 2023 stars
+name: Update 2024 stars
 on:
   schedule:
     - cron: "0 */4 * * *"  # Every 4 hours
