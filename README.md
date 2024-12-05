@@ -21,7 +21,9 @@
 ```
 
 ## Stars ⭐ 
-<!--- advent_readme_stars table 2022 --->
+<!--- advent_readme_stars table 2024 --->
+
+<!--- advent_readme_stars table 2023 --->
 
 <!--- advent_readme_stars table 2022 --->
  2022 Results
