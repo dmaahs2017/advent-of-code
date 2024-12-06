@@ -60,7 +60,7 @@ struct Board {
     starting_pos: IVec2,
     blocked_squares: HashSet<IVec2>,
     guard: (IVec2, Direction),
-    guard_log: Vec<(IVec2, Direction)>,
+    guard_log: HashSet<(IVec2, Direction)>,
     distinct_locations: HashSet<IVec2>,
 }
 
@@ -92,7 +92,7 @@ impl Board {
     }
 
     fn tick(&mut self) {
-        self.guard_log.push(self.guard);
+        self.guard_log.insert(self.guard);
         self.distinct_locations.insert(self.guard.0);
         if self.blocked_squares.contains(&self.guard_facing_pos()) {
             self.turn_guard_right();
@@ -226,7 +226,6 @@ mod day06_tests {
     }
 
     #[test]
-    #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
         assert_eq!(solve_p2(input), 1946)
