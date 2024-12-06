@@ -3,8 +3,10 @@ extern crate test;
 use aoc_2024::*;
 use glam::IVec2;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::default::Default;
+
+use rayon::prelude::*;
 
 use nom::{
     branch::*, bytes::complete as bytes, character::complete as character, combinator::value,
@@ -25,7 +27,7 @@ fn main() {
     );
 }
 
-#[derive(Debug, Clone, Copy, Default, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash)]
 enum Direction {
     #[default]
     North,
@@ -48,35 +50,86 @@ impl Direction {
 
 #[derive(Debug, Clone, Copy)]
 enum Square {
-    Empty(IVec2),
+    Empty,
     Blocked(IVec2),
     Guard(IVec2),
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default)]
 struct Board {
-    empty_squares: Vec<IVec2>,
-    blocked_squares: Vec<IVec2>,
-    guard: IVec2,
-    guard_direction: Direction,
-    guard_visited: HashSet<IVec2>,
+    starting_pos: IVec2,
+    blocked_squares: HashSet<IVec2>,
+    guard: (IVec2, Direction),
+    guard_log: Vec<(IVec2, Direction)>,
+    distinct_locations: HashSet<IVec2>,
 }
 
 impl Board {
-    fn advance_guard(&mut self) {
-        while self.blocked_squares.contains(&self.guard_facing_pos()) {
-            self.guard_direction = self.guard_direction.turn_right();
+
+    fn pretty_print(&self, height: i32, width: i32) {
+        for y in 0..height {
+            println!();
+            for x in 0..width {
+                let pos = IVec2::new(x, y);
+
+                if pos == self.starting_pos {
+                    print!("^");
+                }
+                else if let Some(g) = self.guard_log.iter().find(|lg| lg.0 == pos) {
+                    match g.1 {
+                        Direction::North => print!("|"),
+                        Direction::South => print!("|"),
+                        Direction::East => print!("-"),
+                        Direction::West => print!("-"),
+                    }
+                } else if self.blocked_squares.contains(&pos){
+                    print!("#")
+                }
+
+                else {
+                    print!(".");
+                }
+
+            }
         }
-        self.guard_visited.insert(self.guard);
-        self.guard = self.guard_facing_pos();
+        println!();
+    }
+
+    fn tick(&mut self) {
+        self.guard_log.push(self.guard);
+        self.distinct_locations.insert(self.guard.0);
+        if self.blocked_squares.contains(&self.guard_facing_pos()) {
+            self.turn_guard_right();
+        } else {
+            self.move_guard_forward();
+        }
+    }
+
+    fn has_visited_current_pos(&self) -> bool {
+        self.guard_log.contains(&self.guard)
+    }
+
+    fn is_guard_in_bounds(&self, height: i32, width: i32) -> bool {
+        self.guard.0.x >= 0
+            && self.guard.0.x < width
+            && self.guard.0.y >= 0
+            && self.guard.0.y < height
+    }
+
+    fn move_guard_forward(&mut self) {
+        self.guard.0 = self.guard_facing_pos();
+    }
+
+    fn turn_guard_right(&mut self) {
+        self.guard.1 = self.guard.1.turn_right()
     }
 
     fn guard_facing_pos(&self) -> IVec2 {
-        match self.guard_direction {
-            Direction::North => self.guard + IVec2::new(0, -1),
-            Direction::East => self.guard + IVec2::new(1, 0),
-            Direction::South => self.guard + IVec2::new(0, 1),
-            Direction::West => self.guard + IVec2::new(-1, 0),
+        match self.guard.1 {
+            Direction::North => self.guard.0 + IVec2::new(0, -1),
+            Direction::East => self.guard.0 + IVec2::new(1, 0),
+            Direction::South => self.guard.0 + IVec2::new(0, 1),
+            Direction::West => self.guard.0 + IVec2::new(-1, 0),
         }
     }
 }
@@ -85,7 +138,7 @@ fn parse_square(s: Span) -> IResult<Span, Square> {
     let p = IVec2::new(s.get_column() as i32 - 1, s.location_line() as i32 - 1);
 
     alt((
-        value(Square::Empty(p), bytes::tag(".")),
+        value(Square::Empty, bytes::tag(".")),
         value(Square::Blocked(p), bytes::tag("#")),
         value(Square::Guard(p), bytes::tag("^")),
     ))(s)
@@ -95,14 +148,14 @@ fn parse_board(s: Span) -> IResult<Span, Board> {
     let (s, xs) = separated_list1(character::line_ending, many1(parse_square))(s)?;
 
     let mut board = Board::default();
-
     for s in xs.into_iter().flatten() {
         match s {
-            Square::Empty(p) => board.empty_squares.push(p),
-            Square::Blocked(p) => board.blocked_squares.push(p),
-            Square::Guard(p) => board.guard = p,
+            Square::Empty => (),
+            Square::Blocked(p) => { board.blocked_squares.insert(p); },
+            Square::Guard(p) => board.guard.0 = p,
         }
     }
+    board.starting_pos = board.guard.0;
 
     Ok((s, board))
 }
@@ -111,18 +164,42 @@ pub fn solve_p1(input: &str) -> usize {
     let width = input.lines().count() as i32;
     let height = input.lines().next().unwrap().len() as i32;
     let mut board = parse_board(Span::new(input)).unwrap().1;
-    while board.guard.x >= 0
-        && board.guard.x < width
-        && board.guard.y >= 0
-        && board.guard.y < height
-    {
-        board.advance_guard();
+
+    while board.is_guard_in_bounds(height, width) {
+        board.tick();
     }
-    board.guard_visited.len()
+    board.distinct_locations.len()
 }
 
 pub fn solve_p2(input: &str) -> usize {
-    input.len()
+    let width = input.lines().count() as i32;
+    let height = input.lines().next().unwrap().len() as i32;
+    let starting_board = parse_board(Span::new(input)).unwrap().1;
+
+    let mut board = starting_board.clone();
+    while board.is_guard_in_bounds(height, width)    {
+        board.tick();
+    }
+
+    board
+        .distinct_locations
+        .iter()
+        .filter(|&new_block| {
+            if *new_block == starting_board.guard.0 { return false }
+
+            let mut test_board = starting_board.clone();
+            test_board.blocked_squares.insert(*new_block);
+
+
+            while test_board.is_guard_in_bounds(height, width)            {
+                test_board.tick();
+                if test_board.has_visited_current_pos() {
+                    return true
+                }
+            }
+
+            false
+        }).count()
 }
 
 #[cfg(test)]
@@ -144,9 +221,8 @@ mod day06_tests {
     }
 
     #[test]
-    #[ignore]
     fn p2_sample() {
-        assert_eq!(solve_p2(SAMPLE), 0)
+        assert_eq!(solve_p2(SAMPLE), 6)
     }
 
     #[test]
