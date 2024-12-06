@@ -43,7 +43,7 @@ pub fn solve_p2(input: &str) -> usize {
         .filter(|level| {
             let differences = diffs(level);
             is_safe(&differences)
-                || (0..level.len()).into_iter().any(|i| {
+                || (0..level.len()).any(|i| {
                     let mut level = level.clone();
                     level.remove(i);
                     let differences = diffs(&level);
@@ -53,15 +53,15 @@ pub fn solve_p2(input: &str) -> usize {
         .count()
 }
 
-fn diffs(level: &Vec<i64>) -> Vec<i64> {
+fn diffs(level: &[i64]) -> Vec<i64> {
     level
         .array_windows::<2>()
         .map(|window| window[1] - window[0])
         .collect::<Vec<_>>()
 }
 
-fn is_safe(v: &Vec<i64>) -> bool {
-    v.iter().all(|&n| (n > 0 && n <= 3) || (n < 0 && n >= -3))
+fn is_safe(v: &[i64]) -> bool {
+    v.iter().all(|&n| (n > 0 && n <= 3) || (-3..0).contains(&n))
         && (v.iter().all(|&n| n > 0) || v.iter().all(|&n| n < 0))
 }
 

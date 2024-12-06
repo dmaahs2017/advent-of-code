@@ -28,10 +28,7 @@ pub fn solve_p1(input: &str) -> u64 {
     a.sort();
     b.sort();
 
-    a.into_iter()
-        .zip(b.into_iter())
-        .map(|(a, b)| a.abs_diff(b))
-        .sum()
+    a.into_iter().zip(b).map(|(a, b)| a.abs_diff(b)).sum()
 }
 
 pub fn solve_p2(input: &str) -> u64 {

@@ -2,8 +2,8 @@
 extern crate test;
 use aoc_2024::*;
 use nom::{
-    branch::*, bytes::complete as bytes, character::complete as character, multi::*, sequence::*,
-    IResult, Parser,
+    bytes::complete as bytes, character::complete as character, multi::*, sequence::*, IResult,
+    Parser,
 };
 use nom_supreme::ParserExt;
 use std::collections::{HashMap, HashSet};
@@ -64,7 +64,7 @@ pub fn solve_p1(input: &str) -> u32 {
             }
 
             if well_ordered {
-                return Some(updates[updates.len() / 2]);
+                Some(updates[updates.len() / 2])
             } else {
                 None
             }
@@ -106,7 +106,7 @@ pub fn solve_p2(input: &str) -> u32 {
                         std::cmp::Ordering::Equal
                     }
                 });
-                return Some(updates[updates.len() / 2]);
+                Some(updates[updates.len() / 2])
             } else {
                 None
             }
