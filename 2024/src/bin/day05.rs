@@ -21,8 +21,10 @@ fn main() {
 }
 
 type Updates = Vec<u32>;
+type OrderingMap = HashMap<u32, Vec<u32>>;
 
-fn parse(s: &str) -> IResult<&str, (HashMap<u32, Vec<u32>>, Vec<Updates>)> {
+#[allow(clippy::unwrap_or_default)]
+fn parse(s: &str) -> IResult<&str, (OrderingMap, Vec<Updates>)> {
     separated_pair(
         separated_list1(
             character::line_ending,

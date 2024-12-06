@@ -3,7 +3,7 @@ extern crate test;
 use aoc_2024::*;
 use glam::IVec2;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::default::Default;
 
 use rayon::prelude::*;
@@ -65,7 +65,7 @@ struct Board {
 }
 
 impl Board {
-
+    #[allow(dead_code)]
     fn pretty_print(&self, height: i32, width: i32) {
         for y in 0..height {
             println!();
@@ -74,22 +74,18 @@ impl Board {
 
                 if pos == self.starting_pos {
                     print!("^");
-                }
-                else if let Some(g) = self.guard_log.iter().find(|lg| lg.0 == pos) {
+                } else if let Some(g) = self.guard_log.iter().find(|lg| lg.0 == pos) {
                     match g.1 {
                         Direction::North => print!("|"),
                         Direction::South => print!("|"),
                         Direction::East => print!("-"),
                         Direction::West => print!("-"),
                     }
-                } else if self.blocked_squares.contains(&pos){
+                } else if self.blocked_squares.contains(&pos) {
                     print!("#")
-                }
-
-                else {
+                } else {
                     print!(".");
                 }
-
             }
         }
         println!();
@@ -151,7 +147,9 @@ fn parse_board(s: Span) -> IResult<Span, Board> {
     for s in xs.into_iter().flatten() {
         match s {
             Square::Empty => (),
-            Square::Blocked(p) => { board.blocked_squares.insert(p); },
+            Square::Blocked(p) => {
+                board.blocked_squares.insert(p);
+            }
             Square::Guard(p) => board.guard.0 = p,
         }
     }
@@ -177,29 +175,31 @@ pub fn solve_p2(input: &str) -> usize {
     let starting_board = parse_board(Span::new(input)).unwrap().1;
 
     let mut board = starting_board.clone();
-    while board.is_guard_in_bounds(height, width)    {
+    while board.is_guard_in_bounds(height, width) {
         board.tick();
     }
 
     board
         .distinct_locations
-        .iter()
+        .par_iter()
         .filter(|&new_block| {
-            if *new_block == starting_board.guard.0 { return false }
+            if *new_block == starting_board.guard.0 {
+                return false;
+            }
 
             let mut test_board = starting_board.clone();
             test_board.blocked_squares.insert(*new_block);
 
-
-            while test_board.is_guard_in_bounds(height, width)            {
+            while test_board.is_guard_in_bounds(height, width) {
                 test_board.tick();
                 if test_board.has_visited_current_pos() {
-                    return true
+                    return true;
                 }
             }
 
             false
-        }).count()
+        })
+        .count()
 }
 
 #[cfg(test)]
@@ -229,7 +229,7 @@ mod day06_tests {
     #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
-        assert_eq!(solve_p2(input), 0)
+        assert_eq!(solve_p2(input), 1946)
     }
 }
 
