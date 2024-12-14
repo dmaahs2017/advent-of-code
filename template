@@ -4,7 +4,9 @@ use aoc_{YYYY}::*;
 
 const DAY: u8 = {N};
 
+#[tracing::instrument]
 fn main() {
+    tracing_subscriber::fmt::init();
     let input = &read_input(DAY);
     println!(
         "Day {:0>2}: Part 1 answer = {}, Part 2 answer = {}",
@@ -26,25 +28,25 @@ mod day{NN}_tests {
     
     const SAMPLE: &str = include_str!("../../inputs/day{NN}/sample.txt");
 
-    #[test]
+    #[test_log::test]
     fn p1_sample() {
         assert_eq!(solve_p1(SAMPLE), 0)
     }
 
-    #[test]
+    #[test_log::test]
     #[ignore]
     fn p1_input() {
         let input = &read_input(DAY);
         assert_eq!(solve_p1(input), 0)
     }
 
-    #[test]
+    #[test_log::test]
     #[ignore]
     fn p2_sample() {
         assert_eq!(solve_p2(SAMPLE), 0)
     }
 
-    #[test]
+    #[test_log::test]
     #[ignore]
     fn p2_input() {
         let input = &read_input(DAY);
