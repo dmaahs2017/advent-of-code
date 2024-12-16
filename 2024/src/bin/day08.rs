@@ -3,12 +3,8 @@ extern crate test;
 use aoc_2024::*;
 use glam::IVec2;
 use itertools::Itertools;
-use nom::{
-    bytes::complete as bytes, character::complete as character, multi::*, sequence::*, IResult,
-    Parser,
-};
+use nom::{bytes::complete as bytes, character::complete as character, multi::*, IResult};
 use nom_locate::LocatedSpan;
-use nom_supreme::ParserExt;
 use std::collections::HashMap;
 use tracing::info;
 
@@ -85,13 +81,13 @@ pub fn solve_p2(input: &str) -> usize {
                     let mut a = xs[0];
                     while (0..=width).contains(&a.x) && (0..=height).contains(&a.y) {
                         a -= d;
-                        ans.push(a.clone());
+                        ans.push(a);
                     }
 
                     let mut b = xs[1];
                     while (0..=width).contains(&b.x) && (0..=height).contains(&b.y) {
                         b += d;
-                        ans.push(b.clone());
+                        ans.push(b);
                     }
                     ans
                 })
